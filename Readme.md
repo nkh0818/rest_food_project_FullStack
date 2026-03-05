@@ -1,5 +1,10 @@
 # 사용한것
- ## 하기전 필수사항 
+
+## 깃 사용시 
+- 메인에 넣지말기
+- 브랜치만들어서 넣기 
+
+## 하기전 필수사항 
  - env 파일 만들기 .env.sample 제공
  - DB 켜둬야함
 
@@ -54,9 +59,38 @@
 
 ### 이전거 Readme2에 있음
 
--
--
+## repository
+```text
+UserRepository.java (사용자/로그인 관리용)
 
+RestAreaRepository.java (휴게소 정보 관리용)
+
+FoodRepository.java (음식/메뉴 관리용)
+
+ReviewRepository.java (후기/리뷰 관리용)
+```
+
+```text
+com.yonsai.rest_food_project
+├── config            # 공용 설정 (Security, Swagger, Database)
+├── controller        # API 컨트롤러 (각자 담당 기능별 생성)
+│   ├── AuthController.java       (A 담당: 로그인/회원가입)
+│   ├── RestAreaController.java   (B 담당: 휴게소/음식 조회)
+│   └── ReviewController.java     (C 담당: 리뷰/후기 관리)
+├── service           # 비즈니스 로직
+├── repository        # DB 접근 인터페이스 (공유 권장)
+├── entity            # DB 테이블 매핑 (공유 필수)
+├── dto               # 데이터 전송 객체
+│   ├── request       # 클라이언트 -> 서버 전송용
+│   └── response      # 서버 -> 클라이언트 응답용
+└── security          # JWT 및 인증 필터 (A 담당)
+```
+```text
+담당자,주요 작업 파일
+A (로그인),"AuthController, UserService, JwtTokenProvider","User 엔티티를 관리하며, Security 설정을 팀원에게 공유해야 함."
+B (휴게소),"RestAreaController, RestAreaService, FoodRepository",공공 API에서 데이터를 긁어와 DB에 넣는 기능을 먼저 완성해야 함.
+C (리뷰),"ReviewController, ReviewService, ReviewRepository","User와 Food 엔티티를 참조해야 하므로 A, B의 엔티티가 필요함."
+```
 ### 필요한것
 
 ```text
@@ -69,7 +103,9 @@
 - 경로 주변 휴게소 마커 + 리스트 표시
 - 휴게소 클릭 시 상세 페이지 이동
 
-휴게소 별 베스트 음식
+(휴게소 선택시 휴게소 방향 알아야함)
+
+휴게소 별 베스트 음식(휴게소 선택시)
  메뉴 필터(대표메뉴/가격대/키워드)
 휴게소 별 음식 종류
 휴게소 별 음식리뷰
@@ -107,3 +143,4 @@
 - 특정 메뉴 카테고리 5회 도전 등
 
 ```
+## 페이지종류

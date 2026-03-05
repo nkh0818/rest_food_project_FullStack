@@ -1,8 +1,18 @@
 # 사용한것
 
-### 지금까지 된거 설명
- - 테스트 성공 API 받아올수있음 안되면 키 오류!
+# 페이지 플로우
 
+## 페이지 이동 
+
+### 에러시 
+
+## 지금까지 된거 설명
+ - 테스트 성공 API 받아올수있음 안되면 키 오류!
+ - vscode로 실행시 mvnw spring-boot:run 
+### 테스트시
+ - http://localhost:8080/api/test/road 이 링크로 API 키 넣고 테스트 바람
+ - 테스트시 mvnw test
+ - 테스트시 mvnw test -Dtest=클래스명
 ## ymal파일 정보
    - db : rest_food_db
    - username: root
@@ -39,3 +49,17 @@
 * **카카오맵 API**: [Kakao Developers 바로가기](https://developers.kakao.com/)
 
 ### 이전거 Readme2에 있음
+
+필요한것 - 
+휴게소 별 베스트 음식 
+휴게소 별 음식 종류
+휴게소 별 음식리뷰
+-
+휴게소 정보
+휴게소 즐길거리
+휴게소이벤트
+-
+휴게소 기름값
+-
+전국 특이휴게소 정보
+특이휴게소에 뭐있는지

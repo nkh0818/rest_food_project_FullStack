@@ -15,7 +15,6 @@ public class ApiTestController {
 
     @GetMapping("/api/test/road")
     public String testRoadApi() {
-        // 명세서의 HTTPS 주소와 변수 조합 (JSON 타입 권장)
         String url = "https://data.ex.co.kr/openapi/restinfo/restBestfoodList?key="
                 + roadApiKey + "&type=json&numOfRows=10&pageNo=1";
 

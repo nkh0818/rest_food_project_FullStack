@@ -11,9 +11,25 @@ public class DataInitController {
 
     private final RestAreaDataService restAreaDataService;
 
-    @GetMapping("/init-data")
-    public String initData() {
-        restAreaDataService.fetchAndSaveAll();
-        return "데이터 수집 프로세스 실행됨.!";
+    // 1. 기존: 휴게소 목록만 (A단계)
+    @GetMapping("/init-data-reg")
+    public String initBasic() {
+        // restAreaDataService.fetchAndSaveAll(); // 휴게소 리스트만 저장 혹시몰라서 주석
+        return "기초 정보 수집 완료";
     }
+
+    // 2. 신규: 휴게소 + 음식 + 유가 싹 다 (A+B+C단계)
+    @GetMapping("/init-foods")
+    public String initFoods() {
+        restAreaDataService.fetchAndSaveAllData();
+        return "음식 데이터 수집 시작 (로그를 확인하세요)";
+    }
+
+    // 2. 유가 정보만 수집 (새로 만든 로직)
+    @GetMapping("/init-oil")
+    public String initOil() {
+        restAreaDataService.updateOilPricesOnly();
+        return "실시간 유가 정보 업데이트 완료!";
+    }
+
 }

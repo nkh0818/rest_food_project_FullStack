@@ -15,7 +15,7 @@
 - vscode로 실행시 mvnw spring-boot:run
 
 ### 테스트시
-
+ - MySQL 실행!
 - http://localhost:8080/api/test/road 이 링크로 API 키 넣고 테스트 바람
 - 테스트시 mvnw test
 - 테스트시 mvnw test -Dtest=클래스명

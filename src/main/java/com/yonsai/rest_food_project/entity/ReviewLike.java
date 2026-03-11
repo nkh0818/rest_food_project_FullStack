@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @Table(
     name = "review_likes",
-    uniqueConstraints = {
+    uniqueConstraints = { // 하나의 review_id와 user_id만 매칭하겠다
         @UniqueConstraint(
             name = "uk_review_user",
             columnNames = {"review_id", "user_id"}
@@ -25,17 +25,17 @@ public class ReviewLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 어떤 리뷰에 좋아요를 눌렀는가?
+    // 어떤 리뷰?
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
-    // 누가 좋아요를 눌렀는가?
+    // 누가?
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // 언제 좋아요를 눌렀는가? (통계나 알림용)
+    // 언제?
     private LocalDateTime createdAt;
 
     @PrePersist

@@ -2,6 +2,8 @@ package com.yonsai.rest_food_project.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,12 +21,15 @@ public class RestArea {
     private String name; // 휴게소 명칭
 
     private String routeName; // 노선명 (예: 경부선)
-    private String location; // 주소 또는 좌표
+    private String location; // 주소
 
     @Column(unique = true)
     private String stdRestCd; // 휴게소 코드 (API 매칭용)
 
+    @Column(nullable = false)
     private Double xValue; // 경도
+
+    @Column(nullable = false)
     private Double yValue; // 위도
 
     // --- 주유소 정보 관련 추가 ---
@@ -43,6 +48,13 @@ public class RestArea {
 
     // --- 관계 설정 ---
 
+    // 음식 조회
+    @Builder.Default
+    @OneToMany(mappedBy = "restArea", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Food> foods = new ArrayList<>();
+
+    // 휴게소 자체 리뷰 조회
+    @Builder.Default
     @OneToMany(mappedBy = "restArea", cascade = CascadeType.ALL)
-    private List<Food> foods;
+    private List<Review> reviews = new ArrayList<>();
 }

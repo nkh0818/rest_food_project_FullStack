@@ -1,5 +1,8 @@
 package com.yonsai.rest_food_project.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,21 +12,41 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name="users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String provider; // 어디에서 온 로그인 정보인지? (구글인지, 카카오인지)
+
     @Column(unique = true, nullable = false)
-    private String email;
+    private String providerId; // 해당 서비스에서 보내온 번호
+
+    @Column(unique = true)
+    private String email; // 위에가 해당 안 되면 이메일
+
+    @Column(unique = true, nullable = false)
+    private String nickname; // 랜덤 생성 닉네임
 
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String nickname;
-
+    @Builder.Default
     private int xp = 0; // 경험치 (기본값 0)
+
+    @Builder.Default
     private int level = 1; // 레벨 (기본값 1)
+
+
     private String title; // 칭호
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role; // 권한 (USER, ADMIN)
+
+    // 사용자가 누른 추천 목록 조회
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
+
 }

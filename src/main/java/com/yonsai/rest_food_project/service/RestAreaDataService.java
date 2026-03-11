@@ -154,42 +154,40 @@ public class RestAreaDataService {
         }
     }
 
-    @Transactional
+    @Transactional // 이게 있어야 메서드 종료 시 DB에 반영됩니다!
     public void updateOilPricesOnly() {
-        log.info("==== 전국의 모든 유가 수집 시작 (페이징 처리) ====");
+        log.info("==== 유가 수집 시작 ====");
+        String url = "https://data.ex.co.kr/openapi/business/curStateStation?key="
+                + serviceKey + "&type=json&numOfRows=99&pageNo=2";
 
-        // 1페이지부터 3페이지까지 반복해서 가져옵니다.
-        for (int pageNo = 1; pageNo <= 3; pageNo++) {
-            String url = "https://data.ex.co.kr/openapi/business/curStateStation?key="
-                    + serviceKey + "&type=json&numOfRows=99&pageNo=" + pageNo;
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            JsonNode root = mapper.readTree(response.getBody());
+            JsonNode list = root.path("list");
 
-            try {
-                log.info(">>>> 현재 수집 중인 페이지: {}", pageNo);
-                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-                JsonNode root = mapper.readTree(response.getBody());
-                JsonNode listNode = root.path("list");
+            for (JsonNode node : list) {
+                String apiRestCode = node.path("serviceAreaCode2").asText();
 
-                if (listNode.isArray()) {
-                    for (JsonNode node : listNode) {
-                        String apiRestCode = node.path("stdRestCd").asText();
+                // 1. DB에서 해당 휴게소 찾기
+                restAreaRepository.findByStdRestCd(apiRestCode).ifPresent(area -> {
+                    // [중요 로그] API에서 넘어온 원본 문자열을 직접 찍어봅니다.
+                    String rawGasoline = node.path("gasolinePrice").asText();
+                    log.info(">>>> API 원본 데이터 - 휴게소: {}, 휘발유: '{}'", area.getName(), rawGasoline);
 
-                        // DB에서 해당 휴게소 코드를 찾아 업데이트
-                        restAreaRepository.findByStdRestCd(apiRestCode).ifPresent(area -> {
-                            area.setGasolinePrice(parsePriceInt(node.path("gasolinePrice").asText()));
-                            area.setDiselPrice(parsePriceInt(node.path("diselPrice").asText()));
-                            area.setLpgPrice(parsePriceInt(node.path("lpgPrice").asText()));
-                            area.setOilCompany(node.path("oilCompany").asText());
-                            area.setTelNo(node.path("telNo").asText());
+                    area.setGasolinePrice(parsePriceInt(rawGasoline));
+                    area.setDiselPrice(parsePriceInt(node.path("diselPrice").asText()));
+                    area.setLpgPrice(parsePriceInt(node.path("lpgPrice").asText()));
 
-                            restAreaRepository.save(area);
-                        });
-                    }
-                }
-            } catch (Exception e) {
-                log.error("{} 페이지 수집 중 에러 발생: {}", pageNo, e.getMessage());
+                    area.setOilCompany(node.path("oilCompany").asText());
+                    area.setTelNo(node.path("telNo").asText());
+
+                    restAreaRepository.save(area);
+                    log.info(">>>> [저장된 값] {} - 휘발유: {}", area.getName(), area.getGasolinePrice());
+                });
             }
+        } catch (Exception e) {
+            log.error("에러 발생: {}", e.getMessage());
         }
-        log.info("==== 모든 유가 데이터 수집 완료 ====");
     }
 
     /**

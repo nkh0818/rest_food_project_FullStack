@@ -31,7 +31,7 @@
                             </thead>
                             <tbody>
                                 <tr th:each="food : ${foods}">
-                                    <td class="fw-bold" th:text="${food.name}">우동</td>
+                                    <td class="fw-bold" th:text="${food.foodName}">음식이름</td>
                                     <td class="text-end text-success fw-bold" th:text="${#numbers.formatInteger(food.price, 0, 'COMMA') + '원'}">6,000원</td>
                                 </tr>
                                 <tr th:if="${foods.empty}">
@@ -44,37 +44,43 @@
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm sticky-top" style="top: 20px; border-radius: 20px;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-fuel-pump-fill"></i> 주유소 정보</h5>
-                    <div th:if="${area.gasolinePrice > 0}" class="text-center mb-4">
-                        <span class="badge bg-primary px-3 py-2 mb-2" th:text="${area.oilCompany}">SK에너지</span>
-                        <div class="display-6 fw-bold text-danger mb-1" th:text="${#numbers.formatInteger(area.gasolinePrice, 0, 'COMMA')}">1,800</div>
-                        <div class="text-muted small">현재 휘발유가</div>
-                    </div>
-                    
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">경유</span>
-                            <span class="fw-bold" th:text="${area.diselPrice > 0 ? #numbers.formatInteger(area.diselPrice, 0, 'COMMA') + '원' : '-'}"></span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">LPG</span>
-                            <span class="fw-bold" th:text="${area.lpgPrice > 0 ? #numbers.formatInteger(area.lpgPrice, 0, 'COMMA') + '원' : '-'}"></span>
-                        </li>
-                        <li class="list-group-item px-0 pt-3">
-                            <div class="small text-muted mb-1">문의처</div>
-                            <div class="fw-bold"><i class="bi bi-telephone"></i> <span th:text="${area.telNo}">010-0000-0000</span></div>
-                        </li>
-                    </ul>
-                    
-                    <div th:unless="${area.gasolinePrice > 0}" class="text-center py-4">
-                        <p class="text-muted small mb-0">이 휴게소에는 주유소 정보가 없거나<br>별도의 주유소가 운영 중입니다.</p>
-                    </div>
+    <div class="col-lg-4">
+    <div class="card border-0 shadow-sm sticky-top" style="top: 20px; border-radius: 20px;">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-4"><i class="bi bi-fuel-pump-fill"></i> 주유소 정보</h5>
+            
+            <div th:if="${area.gasolinePrice != null && area.gasolinePrice > 0}">
+                <div class="mb-3">
+                    <span class="badge bg-dark px-3 py-2" th:text="${area.oilCompany}">정유사</span>
                 </div>
+                
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between px-2 py-3">
+                        <span class="text-muted">휘발유</span>
+                        <span class="fw-bold text-dark" th:text="${#numbers.formatInteger(area.gasolinePrice, 0, 'COMMA') + '원'}">0원</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-2 py-3">
+                        <span class="text-muted">경유</span>
+                        <span class="fw-bold text-dark" th:text="${area.diselPrice > 0 ? #numbers.formatInteger(area.diselPrice, 0, 'COMMA') + '원' : '-'}"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-2 py-3">
+                        <span class="text-muted">LPG</span>
+                        <span class="fw-bold text-dark" th:text="${area.lpgPrice > 0 ? #numbers.formatInteger(area.lpgPrice, 0, 'COMMA') + '원' : '-'}"></span>
+                    </li>
+                    <li class="list-group-item px-2 pt-4 border-0">
+                        <div class="small text-muted mb-1">문의처</div>
+                        <div class="fw-bold text-dark"><i class="bi bi-telephone"></i> <span th:text="${area.telNo}">010-0000-0000</span></div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div th:unless="${area.gasolinePrice != null && area.gasolinePrice > 0}" class="text-center py-5">
+                <i class="bi bi-exclamation-circle text-muted display-4 mb-3"></i>
+                <p class="text-muted small mb-0">해당 휴게소는 주유소 정보를<br>제공하지 않습니다.</p>
             </div>
         </div>
+    </div>
+</div>
     </div>
 </div>
 </body>

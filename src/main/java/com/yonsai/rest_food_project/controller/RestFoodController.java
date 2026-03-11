@@ -81,11 +81,27 @@ public class RestFoodController {
         RestArea area = restAreaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 휴게소가 없습니다."));
 
-        // 해당 휴게소에 소속된 모든 음식 리스트 가져오기
+        // [추가] 만약 현재 클릭한 곳이 주유소가 아니라면, 같은 이름을 가진 주유소 정보를 DB에서 찾아봅니다.
+        if (area.getGasolinePrice() == null || area.getGasolinePrice() == 0) {
+            // 이름이 비슷한 주유소를 찾음 (예: '죽전휴게소' 클릭 시 '죽전'이 들어간 주유소 검색)
+            String shortName = area.getName().substring(0, 2); // '죽전'만 추출
+            restAreaRepository.findAll().stream()
+                    .filter(a -> a.getName().contains(shortName) && a.getName().contains("주유소"))
+                    .findFirst()
+                    .ifPresent(gasStation -> {
+                        // 주유소에서 찾은 기름값을 현재 area 객체에 잠시 빌려옵니다.
+                        area.setGasolinePrice(gasStation.getGasolinePrice());
+                        area.setDiselPrice(gasStation.getDiselPrice());
+                        area.setLpgPrice(gasStation.getLpgPrice());
+                        area.setOilCompany(gasStation.getOilCompany());
+                        area.setTelNo(gasStation.getTelNo());
+                    });
+        }
+
         List<Food> foods = foodRepository.findByRestAreaId(id);
 
         model.addAttribute("area", area);
         model.addAttribute("foods", foods);
-        return "food/detail"; // templates/food/detail.html
+        return "food/detail";
     }
 }

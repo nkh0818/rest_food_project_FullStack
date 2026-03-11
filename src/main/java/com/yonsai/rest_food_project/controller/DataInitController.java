@@ -18,18 +18,20 @@ public class DataInitController {
         return "기초 정보 수집 완료";
     }
 
-    // 2. 신규: 휴게소 + 음식 + 유가 싹 다 (A+B+C단계)
+    // 2. 신규: 휴게소 + 음식 + 유가 싹 다 유가아님
     @GetMapping("/init-foods")
     public String initFoods() {
         restAreaDataService.fetchAndSaveAllData();
         return "음식 데이터 수집 시작 (로그를 확인하세요)";
     }
 
-    // 2. 유가 정보만 수집 (새로 만든 로직)
+    // 2. 유가 정보만 수집
     @GetMapping("/init-oil")
     public String initOil() {
         restAreaDataService.updateOilPricesOnly();
         return "실시간 유가 정보 업데이트 완료!";
     }
-
+    // http://localhost:8080/init-oil
+    // http://localhost:8080/init-foods
+    // http://localhost:8080/init-data-reg
 }

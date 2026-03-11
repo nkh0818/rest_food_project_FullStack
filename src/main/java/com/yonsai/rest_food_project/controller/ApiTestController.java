@@ -5,9 +5,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-@RestController
-public class ApiTestController {
+import com.yonsai.rest_food_project.service.RestAreaDataService;
 
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+public class ApiTestController {
+    private final RestAreaDataService restAreaDataService;
     @Value("${road-service-key}")
     private String roadApiKey;
 
@@ -25,4 +30,5 @@ public class ApiTestController {
             return "API 호출 중 진짜 에러 발생: " + e.getMessage();
         }
     }
+
 }

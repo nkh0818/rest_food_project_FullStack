@@ -15,7 +15,7 @@
 - vscode로 실행시 mvnw spring-boot:run
 
 ### 테스트시
-
+ - MySQL 실행!
 - http://localhost:8080/api/test/road 이 링크로 API 키 넣고 테스트 바람
 - 테스트시 mvnw test
 - 테스트시 mvnw test -Dtest=클래스명
@@ -144,3 +144,49 @@ C (리뷰),"ReviewController, ReviewService, ReviewRepository","User와 Food 엔
 
 ```
 ## 페이지종류
+
+```text
+ ERD 사이트
+// 1. 휴게소 정보 테이블
+Table rest_area {
+  id long [primary key, increment, note: 'PK']
+  std_rest_cd varchar [unique, note: '휴게소 표준 코드']
+  name varchar [note: '휴게소명']
+  route_name varchar [note: '노선명']
+  oil_company varchar [note: '정유사 (ex. SK, GS)']
+  gasoline_price int [default: 0]
+  disel_price int [default: 0]
+  lpg_price int [default: 0]
+  tel_no varchar [note: '전화번호']
+  
+  Note: '휴게소 기본 정보 및 실시간 유가 데이터'
+}
+
+// 2. 음식/메뉴 정보 테이블
+Table food {
+  id long [primary key, increment]
+  rest_area_id long [ref: > rest_area.id, note: '어떤 휴게소의 음식인가 (FK)']
+  food_name varchar [note: '음식명']
+  price int [note: '가격']
+  is_best boolean [default: false, note: '추천 메뉴 여부']
+  category varchar [note: '한식, 양식, 분식 등']
+  
+  Note: '휴게소별 판매 음식 목록'
+}
+
+// 3. 사용자 정보 (나중에 로그인 기능을 추가한다면)
+Table user {
+  id long [primary key, increment]
+  username varchar [unique]
+  password varchar
+  role varchar [note: 'USER, ADMIN']
+  
+  Note: '시스템 사용자 정보'
+}
+
+// 관계 설정 (Food는 RestArea에 속함)
+// Ref: food.rest_area_id > rest_area.id
+```
+
+음식 정보 
+1 - 서비스에서 링크 받고 주소 찾음

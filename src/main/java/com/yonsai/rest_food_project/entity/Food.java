@@ -19,7 +19,7 @@ public class Food {
 
     private int price;
     private String category; // 한식, 양식 등
-    private boolean isBest; // 베스트 유무
+    private int isBest; // 베스트 유무
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rest_area_id")

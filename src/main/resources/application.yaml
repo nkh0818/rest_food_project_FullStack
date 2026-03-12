@@ -14,5 +14,12 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+logging:
+  level:
+    com.yonsai.rest_food_project: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+
+# 공공데이터 API 키 등 커스텀 설정
 road-service-key: ${ROAD_SERVICE_KEY}
 # kakao-service-key:

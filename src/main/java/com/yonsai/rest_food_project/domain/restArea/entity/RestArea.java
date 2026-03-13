@@ -28,10 +28,10 @@ public class RestArea {
     @Column(unique = true)
     private String stdRestCd; // 휴게소 코드 (API 매칭용)
 
-    @Column(nullable = false, name="x_value")
+    @Column(nullable = false, name = "x_value")
     private Double longitude; // 경도
 
-    @Column(nullable = false, name="y_value")
+    @Column(nullable = false, name = "y_value")
     private Double latitude; // 위도
 
     // --- 주유소 정보 관련 추가 ---

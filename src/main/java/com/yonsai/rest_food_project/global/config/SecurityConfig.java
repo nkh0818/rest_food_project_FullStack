@@ -18,6 +18,7 @@ public class SecurityConfig {
                     config.setAllowedOrigins(java.util.List.of("http://localhost:3000")); // 리액트 주소 허용
                     config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(java.util.List.of("*"));
+                    config.setAllowCredentials(true); // 쿠키, 인증 헤더 허용 
                     return config;
                 }))
                 .csrf(csrf -> csrf.disable())

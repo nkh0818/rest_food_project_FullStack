@@ -27,4 +27,19 @@ public class RestAreaResponseDto {
     // 카카오 API 연동 등 내부 로직용 필드 (JSON에 없으므로 자동 무시됨)
     private String kakaoName;
     private String details;
+    private Double gasolinePrice = 0.0;
+    private Double dieselPrice = 0.0;
+    private Double lpgPrice = 0.0;
+
+    public Double getPriceByFuelType(String fuelType) {
+        if (fuelType == null)
+            return 0.0;
+
+        return switch (fuelType) {
+            case "gasoline" -> (gasolinePrice != null) ? gasolinePrice : 0.0;
+            case "diesel" -> (dieselPrice != null) ? dieselPrice : 0.0;
+            case "lpg" -> (lpgPrice != null) ? lpgPrice : 0.0;
+            default -> 0.0;
+        };
+    }
 }

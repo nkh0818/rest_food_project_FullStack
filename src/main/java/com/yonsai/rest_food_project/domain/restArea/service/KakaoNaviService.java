@@ -2,6 +2,8 @@ package com.yonsai.rest_food_project.domain.restArea.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -13,8 +15,10 @@ import java.util.*;
 @Slf4j
 public class KakaoNaviService {
 
-    // 사용자님의 REST API 키를 입력하세요
-    private final String REST_API_KEY = "키";
+    @Value("${KAKAO_NAVI}")
+    private String kakaoNaviKey;
+
+    private final String REST_API_KEY = kakaoNaviKey;
     private final String KAKAO_URL = "https://apis-navi.kakaomobility.com/v1/directions";
 
     public Map<String, Object> getRouteWithRestAreas(String origin, String destination) {

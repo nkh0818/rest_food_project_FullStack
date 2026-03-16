@@ -11,6 +11,7 @@ import com.yonsai.rest_food_project.domain.restArea.repository.RestAreaRepositor
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.geo.Point;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -188,6 +189,35 @@ public class RestAreaDataService {
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) +
                 Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
         dist = Math.acos(dist);
-        return Math.toDegrees(dist) * 60 * 1.1515 * 1.609344;
+        dist = Math.toDegrees(dist);
+        return dist * 60 * 1.1515 * 1.609344;
+    }
+
+    // 경로 상의 휴게소 필터링 메서드
+    public List<RestAreaResponseDto> getRestAreasOnPath(List<Point> routePoints, double radiusKm) {
+        return originalData.stream()
+                .filter(area -> routePoints.stream()
+                        .anyMatch(point -> calculateDistance(point.getY(), point.getX(), area.getY(),
+                                area.getX()) <= radiusKm))
+                .collect(Collectors.toList());
+    }
+
+    public List<RestAreaResponseDto> getSortedGasStations(List<RestAreaResponseDto> list, String fuelType,
+            boolean ascending) {
+        return list.stream()
+                .filter(area -> area.getType().contains("주유소")) // 주유소만 필터링
+                .sorted((a, b) -> {
+                    Double priceA = a.getPriceByFuelType(fuelType); // 유종에 따른 가격 가져오기 (커스텀 메서드 필요)
+                    Double priceB = b.getPriceByFuelType(fuelType);
+
+                    // 가격 정보가 없는 경우(0 또는 null) 맨 뒤로 보냄
+                    if (priceA == null || priceA <= 0)
+                        return 1;
+                    if (priceB == null || priceB <= 0)
+                        return -1;
+
+                    return ascending ? Double.compare(priceA, priceB) : Double.compare(priceB, priceA);
+                })
+                .collect(Collectors.toList());
     }
 }

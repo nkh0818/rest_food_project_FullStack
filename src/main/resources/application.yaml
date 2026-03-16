@@ -40,6 +40,7 @@ logging:
 
 # 공공데이터 API 키 등 커스텀 설정
 road-service-key: ${ROAD_SERVICE_KEY}
+kakaoNaviKey: ${KAKAO_NAVI}
 
 # kakao
 kakao:

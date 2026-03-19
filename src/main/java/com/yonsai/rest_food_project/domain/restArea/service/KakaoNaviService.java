@@ -34,7 +34,7 @@ public class KakaoNaviService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // 카카오 로컬 API로 장소 검색
-        String url = UriComponentsBuilder.fromHttpUrl(LOCAL_URL)
+        String url = UriComponentsBuilder.fromUriString(LOCAL_URL)
                 .queryParam("query", keyword)
                 .build().toUriString();
 

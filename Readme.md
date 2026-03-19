@@ -13,7 +13,7 @@
 
 - 테스트 성공 API 받아올수있음 안되면 키 오류!
 - vscode로 실행시 mvnw spring-boot:run
-
+mvnw spring-boot:run
 ### 테스트시
  - MySQL 실행!
 - http://localhost:8080/api/test/road 이 링크로 API 키 넣고 테스트 바람

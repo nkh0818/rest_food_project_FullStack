@@ -41,7 +41,7 @@ logging:
 # 공공데이터 API 키 등 커스텀 설정
 road-service-key: ${ROAD_SERVICE_KEY}
 kakaoNaviKey: ${KAKAO_NAVI}
-
+YoutubeKey: ${YOUTUBE_KEY}
 # kakao
 kakao:
   client-id: ${KAKAO_CLIENT_ID:내_애플리케이션_REST_API_키}

@@ -26,7 +26,7 @@ public class RestFoodController {
 
     private final RestAreaRepository restAreaRepository;
     private final FoodRepository foodRepository;
-    private final KakaoNaviService kakaoNaviService; // 카카오 네비 서비스 추가됨
+    private final KakaoNaviService kakaoNaviService; // 카카오 네비 서비스
 
     // 1. 리스트 출력 (검색, 경로, 주유소 정렬 포함)
     @GetMapping("/list")
@@ -160,7 +160,6 @@ public class RestFoodController {
         return "food/list";
     }
 
-    // [중요!] 여기가 비어있어서 에러가 났던 곳입니다. /{} 로 채웠습니다.
     // 2. 특정 휴게소 클릭 시 상세 메뉴판 보여주기
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
@@ -209,4 +208,5 @@ public class RestFoodController {
         dist = Math.toDegrees(dist);
         return dist * 60 * 1.1515 * 1.609344;
     }
+
 }

@@ -24,7 +24,7 @@ public class RestAreaResponseDto {
     @JsonProperty("휴게소종류")
     private String type;
 
-    // 카카오 API 연동 등 내부 로직용 필드 (JSON에 없으므로 자동 무시됨)
+    // 카카오 API 연동 등 내부 로직용 필드
     private String kakaoName;
     private String details;
     private Double gasolinePrice = 0.0;

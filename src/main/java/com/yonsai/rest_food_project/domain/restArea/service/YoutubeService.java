@@ -69,12 +69,12 @@ public class YoutubeService {
             }
 
             if (parsedList.isEmpty()) {
-                System.out.println("!!! 저장할 데이터가 없습니다 (중복이거나 추출 실패) !!!");
+                System.out.println("저장할 데이터가 없습니다 (중복이거나 추출 실패) !!!");
             }
 
             return repository.saveAll(parsedList);
         } catch (Exception e) {
-            System.err.println("!!! 에러 발생: " + e.getMessage()); // 진단 로그 4
+            System.err.println("에러 발생: " + e.getMessage()); // 진단 로그 4
             e.printStackTrace();
             return new ArrayList<>();
         }

@@ -65,7 +65,7 @@ public class RestFoodController {
                     }
 
                     if (!found.isEmpty()) {
-                        // ⭐ 1. 카카오 좌표와 가장 가까운 진짜 휴게소(내 진행 방향)를 찾습니다.
+                        // 1. 카카오 좌표와 가장 가까운 진짜 휴게소(내 진행 방향)를 찾습니다.
                         RestArea closestArea = null;
                         double minDistance = Double.MAX_VALUE;
 
@@ -77,7 +77,7 @@ public class RestFoodController {
                             }
                         }
 
-                        // ⭐ 2. 진짜 내 방향의 휴게소 이름에서 괄호 (방향) 글자를 뽑아냅니다. (예: "기흥(부산)휴게소" -> "(부산)")
+                        // 2. 진짜 내 방향의 휴게소 이름에서 괄호 (방향) 글자를 뽑아냅니다. (예: "기흥(부산)휴게소" -> "(부산)")
                         String targetDirection = "";
                         if (closestArea != null && closestArea.getName().contains("(")) {
                             int startIdx = closestArea.getName().indexOf("(");
@@ -87,7 +87,7 @@ public class RestFoodController {
                             }
                         }
 
-                        // ⭐ 3. 뽑아낸 방향과 똑같은 녀석들만 리스트에 넣습니다. (반대편 상행선은 걸러짐!)
+                        // 3. 뽑아낸 방향과 똑같은 녀석들만 리스트에 넣습니다. (반대편 상행선은 걸러짐!)
                         for (RestArea matchedArea : found) {
                             // 방향 괄호가 있고, 뽑아낸 방향과 이름이 다르면 가차 없이 스킵!
                             if (!targetDirection.isEmpty() && !matchedArea.getName().contains(targetDirection)) {

@@ -44,7 +44,7 @@ public class RestAreaDataService {
     public void initData(List<RestAreaResponseDto> dataList) {
         this.originalData = dataList;
         this.currentSearchResult = new ArrayList<>(dataList);
-        log.info("✅ 메모리 데이터 로드 완료: {}건", dataList.size());
+        log.info(" 메모리 데이터 로드 완료: {}건", dataList.size());
     }
 
     // ================= [검색/필터/매칭 기능] =================
@@ -207,7 +207,7 @@ public class RestAreaDataService {
         return list.stream()
                 .filter(area -> area.getType().contains("주유소")) // 주유소만 필터링
                 .sorted((a, b) -> {
-                    Double priceA = a.getPriceByFuelType(fuelType); // 유종에 따른 가격 가져오기 (커스텀 메서드 필요)
+                    Double priceA = a.getPriceByFuelType(fuelType); // 유종에 따른 가격 가져오기
                     Double priceB = b.getPriceByFuelType(fuelType);
 
                     // 가격 정보가 없는 경우(0 또는 null) 맨 뒤로 보냄

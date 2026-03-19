@@ -39,13 +39,13 @@ public class DataInitializer implements CommandLineRunner {
                 // 3. 서비스에 데이터 주입
                 restAreaService.initData(dataList);
 
-                System.out.println("✅ 성공: 휴게소 데이터 " + dataList.size() + "건 로드 완료");
+                System.out.println(" 성공: 휴게소 데이터 " + dataList.size() + "건 로드 완료");
             } else {
-                System.err.println("⚠️ 경고: JSON 파일에 'records' 데이터가 없습니다.");
+                System.err.println("JSON 파일에 'records' 데이터가 없습니다.");
             }
 
         } catch (Exception e) {
-            System.err.println("❌ 실패: 데이터 로드 중 오류 발생 - " + e.getMessage());
+            System.err.println(" 실패: 데이터 로드 중 오류 발생 - " + e.getMessage());
             e.printStackTrace(); // 상세한 에러 로그 확인을 위해 추가
         }
     }

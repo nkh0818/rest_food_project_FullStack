@@ -10,5 +10,5 @@ import com.yonsai.rest_food_project.domain.restArea.entity.YoutubePlaylist;
 public interface YoutubeRepository extends JpaRepository<YoutubePlaylist, Long> {
     List<YoutubePlaylist> findBySearchKey(String searchKey);
 
-    boolean existsByPlaylistId(String playlistId); // 중복 체크용
+    boolean existsByPlaylistId(String playlistId);
 }

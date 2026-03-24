@@ -32,7 +32,9 @@
                             <tbody>
                                 <tr th:each="food : ${foods}">
                                     <td class="fw-bold" th:text="${food.foodName}">음식이름</td>
-                                    <td class="text-end text-success fw-bold" th:text="${#numbers.formatInteger(food.price, 0, 'COMMA') + '원'}">6,000원</td>
+                                    <td class="text-end text-success fw-bold">
+                                        <span th:text="${food.price > 0} ? ${#numbers.formatInteger(food.price, 0, 'COMMA') + '원'} : ' 직접 문의 '"></span>
+                                    </td>
                                 </tr>
                                 <tr th:if="${foods.empty}">
                                     <td colspan="2" class="text-center py-4 text-muted">등록된 메뉴 정보가 없습니다.</td>

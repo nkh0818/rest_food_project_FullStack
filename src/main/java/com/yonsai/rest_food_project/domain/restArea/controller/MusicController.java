@@ -33,12 +33,12 @@ public class MusicController {
         List<YoutubePlaylist> myPlaylists = youtubeRepository.findAll();
 
         model.addAttribute("playlists", myPlaylists);
-        return "playlist_view"; // 저장된 목록 전용 HTML
+        return "music/playlist_view";
     }
 
     /**
-     * 2. 검색어 추가 기능 (버튼 누르면 DB에 저장)
-     * URL: /music/search?q=검색어
+     * 2 검색어 추가 기능 버튼 누르면 DB에 저장
+     * URL: /music/search?q=검색어 강제
      */
     @GetMapping("/search")
     public String searchAndSave(@RequestParam String q, Model model) {

@@ -68,11 +68,14 @@ public class RestAreaDataService {
     }
 
     public RestAreaResponseDto findBestMatch(String kakaoName, double kX, double kY) {
+        // 공백 제거 , 4글자이상 까지! 4개이하일경우 X
         String cleanKa = kakaoName.replace(" ", "").substring(0, Math.min(kakaoName.length(), 4));
         return originalData.stream().filter(db -> {
+            // 특수기호 없에기 하나씩 가저올때
             String cleanDb = db.getDbName().replaceAll("\\(.*?\\)", "").replace(" ", "")
                     .substring(0, Math.min(db.getDbName().length(), 4));
             double dist = calculateDistance(kY, kX, db.getY(), db.getX());
+            // 거리로 매칭 혹은 (카카오이름에 디비 ) , 디비에 카카오 , 거리 1.5이하
             return cleanKa.contains(cleanDb) || cleanDb.contains(cleanKa) || dist < 1.5;
         }).findFirst().orElse(null);
     }
@@ -85,7 +88,7 @@ public class RestAreaDataService {
         for (RestArea area : allAreas) {
             try {
                 fetchAndSaveAllFoods(area);
-                Thread.sleep(100);
+                Thread.sleep(100); // 공공 데이터 api 폭탄 막기
             } catch (Exception e) {
                 log.error("!! {} 수집 중 에러: {}", area.getName(), e.getMessage());
             }
@@ -184,6 +187,7 @@ public class RestAreaDataService {
         }
     }
 
+    // 거리 찾기 기능임 ,, Ai
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) +

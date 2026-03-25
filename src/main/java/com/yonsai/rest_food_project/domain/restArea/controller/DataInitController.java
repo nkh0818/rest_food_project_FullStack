@@ -5,12 +5,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yonsai.rest_food_project.domain.restArea.service.RestAreaDataService;
+import com.yonsai.rest_food_project.domain.restArea.service.RestAreaEventService;
 
 @RestController
 @RequiredArgsConstructor
 public class DataInitController {
 
     private final RestAreaDataService restAreaDataService;
+    private final RestAreaEventService eventService;
 
     // 1. 기존: 휴게소 목록만 (A단계)
     @GetMapping("/init-data-reg")
@@ -32,7 +34,15 @@ public class DataInitController {
         restAreaDataService.updateOilPricesOnly();
         return "실시간 유가 정보 업데이트 완료!";
     }
+
+    @GetMapping("/init-events")
+    public String initEvents() {
+        eventService.fetchAndSaveAllEvents();
+        return "이벤트 데이터 수집 완료!";
+    }
     // http://localhost:8080/init-oil
     // http://localhost:8080/init-foods
     // http://localhost:8080/init-data-reg
+    //
+    // http://localhost:8080/events 휴게소 이벤트들
 }

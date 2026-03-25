@@ -1,4 +1,8 @@
 # 사용한것
+
+https://data.ex.co.kr/openapi/restinfo/restEventList 
+이거 https://data.ex.co.kr/openapi/basicinfo/openApiInfoM?apiId=0505&pn=-1
+이거임 쓰기
 - ✅
 - ⭐
 - ❌

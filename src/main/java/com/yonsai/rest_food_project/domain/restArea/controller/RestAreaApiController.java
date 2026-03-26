@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/rest-area") // API 전용 경로
+@RequestMapping("/api/rest-area")
 public class RestAreaApiController {
 
     private final RestAreaDataService restAreaDataService;

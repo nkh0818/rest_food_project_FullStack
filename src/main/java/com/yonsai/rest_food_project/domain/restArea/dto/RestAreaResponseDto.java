@@ -31,7 +31,7 @@ public class RestAreaResponseDto {
     private Double dieselPrice = 0.0;
     private Double lpgPrice = 0.0;
 
-    public Double getPriceByFuelType(String fuelType) {
+    public Double getPriceByFuelType(String fuelType) {// 어짜피 한번 사용임 짧게쓰기 위해
         if (fuelType == null)
             return 0.0;
 

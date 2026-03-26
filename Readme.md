@@ -1,8 +1,24 @@
+
+# 추가 
+0325
+이벤트정보 추가 DB에 넣기
+http://localhost:8080/init-events
+
+DB에 주유소 코드 stdRestCd <-> 주유소 코드로 이벤트 확인
+
+p.
+이벤트 확인페이지- 페이지네이션.
+이벤트 - 클릭시 다른정보 들어옴
+이벤트 - 이벤트 없는페이지는 이벤트 없다고 알림 혹은 확인하라고 만들기
+이벤트 - 이벤트 역순 (순서) 해서 최신순으로 나오는거처럼 보이게 하기
+
+DB테이블에 1~15 까지는 휴게소 코드 안들감 삭제 후 다시 
+
+
+
 # 사용한것
 
-https://data.ex.co.kr/openapi/restinfo/restEventList 
-이거 https://data.ex.co.kr/openapi/basicinfo/openApiInfoM?apiId=0505&pn=-1
-이거임 쓰기
+
 - ✅
 - ⭐
 - ❌

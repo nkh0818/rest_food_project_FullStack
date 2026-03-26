@@ -16,7 +16,7 @@ public class RestAreaEvent {
     private String eventDetail;
 
     @Column(length = 500)
-    private String eventNm; // 이벤트 제목이 길 경우 대비
+    private String eventNm; // 이벤트 제목이 길어서 안들어가니 늘림
     private String stdRestCd;
     private String eventSeq;
     private String stime;

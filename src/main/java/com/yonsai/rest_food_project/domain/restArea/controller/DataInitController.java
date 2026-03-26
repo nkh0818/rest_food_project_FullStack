@@ -43,6 +43,5 @@ public class DataInitController {
     // http://localhost:8080/init-oil
     // http://localhost:8080/init-foods
     // http://localhost:8080/init-data-reg
-    //
-    // http://localhost:8080/events 휴게소 이벤트들
+    // http://localhost:8080/init-events 휴게소 이벤트들
 }

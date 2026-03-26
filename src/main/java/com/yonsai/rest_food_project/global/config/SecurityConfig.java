@@ -15,10 +15,12 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new org.springframework.web.cors.CorsConfiguration();
-                    config.setAllowedOrigins(java.util.List.of("http://localhost:3000")); // 리액트 주소 허용
+                    config.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:3000")); // 리액트
+                                                                                                                   // 주소
+                                                                                                                   // 허용
                     config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(java.util.List.of("*"));
-                    config.setAllowCredentials(true); // 쿠키, 인증 헤더 허용 
+                    config.setAllowCredentials(true); // 쿠키, 인증 헤더 허용
                     return config;
                 }))
                 .csrf(csrf -> csrf.disable())

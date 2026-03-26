@@ -1,24 +1,25 @@
 package com.yonsai.rest_food_project.domain.restArea.controller;
 
-import com.yonsai.rest_food_project.domain.restArea.dto.RestAreaResponseDto;
-import com.yonsai.rest_food_project.domain.restArea.service.RestAreaDataService;
+import com.yonsai.rest_food_project.domain.restArea.entity.RestArea;
+import com.yonsai.rest_food_project.domain.restArea.repository.RestAreaRepository; // 사용자님의 리포지토리 경로 확인
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/rest-areas")
-@RequiredArgsConstructor
+@RequestMapping("/api/restareas")
+@RequiredArgsConstructor // Repository 주입을 위해 필요합니다.
 public class RestAreaTestController {
 
-    private final RestAreaDataService restAreaService;
+    private final RestAreaRepository restAreaRepository;
 
-    // 모든 휴게소 데이터 가져오기
-    // @GetMapping
-    // public List<RestAreaResponseDto> getAllRestAreas() {
-    // return restAreaService.getOriginalData(); // 서비스에 getter가 있어야 함
-    // }
+    @GetMapping("/search")
+    public List<RestArea> searchFromDb(@RequestParam("start") String start,
+            @RequestParam("end") String end) {
+        // 🚀 DB에 저장된 모든 휴게소 데이터를 리액트로 던집니다.
+        // 나중에 검색 로직이 완성되면 findAll() 대신 검색 메서드를 넣으세요.
+        return restAreaRepository.findAll();
+    }
 }

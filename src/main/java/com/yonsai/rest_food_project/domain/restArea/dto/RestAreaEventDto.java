@@ -10,7 +10,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class RestAreaEventDto {
-    private String stdRestCd; // 👈 이 필드를 추가하세요! (휴게소/주유소 코드)
+    private String stdRestCd; // 휴게소/주유소 코드
     private String eventSeq; // 일련번호
     private String stime; // 시작일
     private String etime; // 종료일
@@ -21,9 +21,10 @@ public class RestAreaEventDto {
     private String svarAddr; // 주소
 
     // Entity로 변환하는 메서드도 업데이트
+    // 어짜피 한번 사용임 짧게쓰기 위해 여기에 로직사용
     public RestAreaEvent toEntity() {
         return RestAreaEvent.builder()
-                .stdRestCd(this.stdRestCd) // 👈 Entity에도 추가 필요
+                .stdRestCd(this.stdRestCd)
                 .eventSeq(this.eventSeq)
                 .stime(this.stime)
                 .etime(this.etime)

@@ -20,18 +20,18 @@ import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor // 🔥 final이 붙은 eventRepository만 생성자로 만듭니다.
+@RequiredArgsConstructor // final이 붙은 eventRepository 생성자로
 public class RestAreaEventService {
 
     private final RestAreaEventRepository eventRepository;
 
-    // 🛠️ 수정: 빈 주입 에러 방지를 위해 직접 생성 (final 제거)
+    // 빈 주입 에러 방지를 위해 직접 생성 (final 제거)
     private final RestTemplate restTemplate = createRestTemplate();
 
     @Value("${road-service-key}")
     private String serviceKey;
 
-    // 🛠️ 추가: RestTemplate 설정 (기존 생성자에 있던 컨버터 설정 포함)
+    // RestTemplate 설정 (기존 생성자에 있던 컨버터 설정 포함)
     private RestTemplate createRestTemplate() {
         RestTemplate rt = new RestTemplate();
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
@@ -40,7 +40,7 @@ public class RestAreaEventService {
         return rt;
     }
 
-    // 🔥 추가: 관련 이벤트 가져오기 로직
+    // 이벤트 가져오기
     public List<RestAreaEvent> getRelatedEvents(String stdRestCd, String restAreaName) {
         List<RestAreaEvent> allEvents = new ArrayList<>();
         allEvents.addAll(eventRepository.findByStdRestCd(stdRestCd));

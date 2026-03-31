@@ -3,6 +3,7 @@ package com.yonsai.rest_food_project.domain.restArea.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yonsai.rest_food_project.domain.review.entity.Review;
 
 import jakarta.persistence.*;
@@ -30,6 +31,7 @@ public class Food {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rest_area_id")
+    @JsonIgnore
     private RestArea restArea;
 
     @Builder.Default

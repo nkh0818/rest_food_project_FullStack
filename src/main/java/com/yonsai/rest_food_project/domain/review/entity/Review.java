@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yonsai.rest_food_project.domain.restArea.entity.Food;
 import com.yonsai.rest_food_project.domain.restArea.entity.RestArea;
 import com.yonsai.rest_food_project.domain.user.entity.User;
@@ -29,12 +30,13 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_id")
+    @JsonIgnore
     private Food food;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content; // 리뷰 내용
 
-    @Column(nullable = false) 
+    @Column(nullable = false)
     private int rating; // 평점 (1~5)
     private String tag; // 맛있다, 별로다 등 태그
 
@@ -48,7 +50,6 @@ public class Review {
 
     private String imageUrl;
     private LocalDateTime createdAt;
-
 
     // 추천 수 증가
     public void addLike() {

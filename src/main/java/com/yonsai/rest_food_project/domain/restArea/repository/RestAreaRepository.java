@@ -1,6 +1,7 @@
 package com.yonsai.rest_food_project.domain.restArea.repository;
 
 import java.util.List;
+
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.yonsai.rest_food_project.domain.restArea.entity.RestArea;
 
 public interface RestAreaRepository extends JpaRepository<RestArea, Long> {
+
     boolean existsByStdRestCd(String stdRestCd);
 
     List<RestArea> findByNameContaining(String keyword);
@@ -17,4 +19,5 @@ public interface RestAreaRepository extends JpaRepository<RestArea, Long> {
     List<RestArea> findByRouteNameContaining(String routeName);
 
     Optional<RestArea> findByStdRestCd(String stdRestCd);
+
 }

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,20 +32,16 @@ public class RestAreaDataService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    // 메모리 검색/매칭용 데이터 저장소
     private List<RestAreaResponseDto> originalData = new ArrayList<>();
     private List<RestAreaResponseDto> currentSearchResult = new ArrayList<>();
 
     @Value("${road-service-key}")
     private String serviceKey;
 
-    /**
-     * 초기 데이터 주입 (DataInitializer용)
-     */
     public void initData(List<RestAreaResponseDto> dataList) {
         this.originalData = dataList;
         this.currentSearchResult = new ArrayList<>(dataList);
-        log.info(" 메모리 데이터 로드 완료: {}건", dataList.size());
+        log.info("✅ 메모리 데이터 로드 완료: {}건", dataList.size());
     }
 
     // ================= [검색/필터/매칭 기능] =================
@@ -67,17 +64,42 @@ public class RestAreaDataService {
         return this.currentSearchResult;
     }
 
+    /**
+     * 개선된 findBestMatch: 에러 방어 및 거리순 정렬 추가
+     */
     public RestAreaResponseDto findBestMatch(String kakaoName, double kX, double kY) {
-        // 공백 제거 , 4글자이상 까지! 4개이하일경우 X
-        String cleanKa = kakaoName.replace(" ", "").substring(0, Math.min(kakaoName.length(), 4));
-        return originalData.stream().filter(db -> {
-            // 특수기호 없에기 하나씩 가저올때
-            String cleanDb = db.getDbName().replaceAll("\\(.*?\\)", "").replace(" ", "")
-                    .substring(0, Math.min(db.getDbName().length(), 4));
-            double dist = calculateDistance(kY, kX, db.getY(), db.getX());
-            // 거리로 매칭 혹은 (카카오이름에 디비 ) , 디비에 카카오 , 거리 1.5이하
-            return cleanKa.contains(cleanDb) || cleanDb.contains(cleanKa) || dist < 1.5;
-        }).findFirst().orElse(null);
+        if (kakaoName == null || originalData.isEmpty())
+            return null;
+
+        // 1. 카카오 이름에서 '휴게소'와 공백 제거 (예: "가평휴게소" -> "가평")
+        String cleanKa = kakaoName.replace("휴게소", "").replace(" ", "").trim();
+
+        return originalData.stream()
+                .filter(db -> {
+                    String dbName = db.getDbName() != null ? db.getDbName() : "";
+
+                    // 2. DB 이름 전처리: 괄호와 그 안의 내용 제거, 공백/휴게소 제거
+                    // 예: "가평(춘천)휴게소" -> "가평"
+                    String cleanDb = dbName.replaceAll("\\(.*?\\)", "")
+                            .replace("휴게소", "")
+                            .replace(" ", "")
+                            .trim();
+
+                    // 3. 거리 계산
+                    double dist = calculateDistance(kY, kX, db.getY(), db.getX());
+
+                    // 4. [핵심] search 메서드와 로직 100% 통일
+                    // 가평이든 죽전이든 어느 한 쪽이 포함만 되어 있으면 무조건 통과
+                    boolean isNameMatch = (!cleanDb.isEmpty() && !cleanKa.isEmpty()) &&
+                            (cleanDb.contains(cleanKa) || cleanKa.contains(cleanDb));
+
+                    // 이름이 매칭되거나, 혹은 이름이 달라도 거리가 5km 이내면 후보군에 포함
+                    // (가평휴게소처럼 부지가 넓은 곳을 위해 거리 제한을 5km로 대폭 상향)
+                    return isNameMatch || dist < 5.0;
+                })
+                // 5. 후보들 중 가장 가까운 놈으로 최종 선택
+                .min(Comparator.comparingDouble(db -> calculateDistance(kY, kX, db.getY(), db.getX())))
+                .orElse(null);
     }
 
     // ================= [공공데이터 수집 기능] =================
@@ -88,7 +110,7 @@ public class RestAreaDataService {
         for (RestArea area : allAreas) {
             try {
                 fetchAndSaveAllFoods(area);
-                Thread.sleep(100); // 공공 데이터 api 폭탄 막기
+                Thread.sleep(100);
             } catch (Exception e) {
                 log.error("!! {} 수집 중 에러: {}", area.getName(), e.getMessage());
             }
@@ -187,7 +209,6 @@ public class RestAreaDataService {
         }
     }
 
-    // 거리 찾기 기능임 ,, Ai
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) +
@@ -197,7 +218,6 @@ public class RestAreaDataService {
         return dist * 60 * 1.1515 * 1.609344;
     }
 
-    // 경로 상의 휴게소 필터링 메서드
     public List<RestAreaResponseDto> getRestAreasOnPath(List<Point> routePoints, double radiusKm) {
         return originalData.stream()
                 .filter(area -> routePoints.stream()
@@ -209,12 +229,11 @@ public class RestAreaDataService {
     public List<RestAreaResponseDto> getSortedGasStations(List<RestAreaResponseDto> list, String fuelType,
             boolean ascending) {
         return list.stream()
-                .filter(area -> area.getType().contains("주유소")) // 주유소만 필터링
+                .filter(area -> area.getType() != null && area.getType().contains("주유소"))
                 .sorted((a, b) -> {
-                    Double priceA = a.getPriceByFuelType(fuelType); // 유종에 따른 가격 가져오기
+                    Double priceA = a.getPriceByFuelType(fuelType);
                     Double priceB = b.getPriceByFuelType(fuelType);
 
-                    // 가격 정보가 없는 경우(0 또는 null) 맨 뒤로 보냄
                     if (priceA == null || priceA <= 0)
                         return 1;
                     if (priceB == null || priceB <= 0)

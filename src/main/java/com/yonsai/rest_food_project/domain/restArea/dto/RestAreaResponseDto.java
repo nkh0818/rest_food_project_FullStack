@@ -23,7 +23,8 @@ public class RestAreaResponseDto {
     // JSON의 "휴게소종류" 필드를 DTO의 type에 매핑
     @JsonProperty("휴게소종류")
     private String type;
-
+    @JsonProperty("휴게소코드")
+    private String stdRestCd;
     // 카카오 API 연동 등 내부 로직용 필드
     private String kakaoName;
     private String details;

@@ -8,6 +8,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+<<<<<<< HEAD
     show-sql: false
     properties:
       hibernate:
@@ -27,6 +28,14 @@ spring:
           min-idle: 2       
           max-wait: 3000ms  
 
+=======
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+>>>>>>> 40c2401ca08ce26ae06603221714666c50d73876
   security:
     oauth2:
       client:
@@ -44,8 +53,11 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+<<<<<<< HEAD
   
 
+=======
+>>>>>>> 40c2401ca08ce26ae06603221714666c50d73876
 
 logging:
   level:
@@ -53,12 +65,19 @@ logging:
     org.hibernate.SQL: info
     org.hibernate.orm.jdbc.bind: INFO
     org.hibernate.type.descriptor.sql: trace
+<<<<<<< HEAD
     com.yonsai.rest_food_project.global.config.DataInitializer: WARN
+=======
+>>>>>>> 40c2401ca08ce26ae06603221714666c50d73876
 
 # 공공데이터 API 키 등 커스텀 설정
 road-service-key: ${ROAD_SERVICE_KEY}
 YoutubeKey: asd
+<<<<<<< HEAD
 kakaoNaviKey: ${KAKAO_NAVI_KEY}
+=======
+kakaoNaviKey: ${KAKAO_NAVI}
+>>>>>>> 40c2401ca08ce26ae06603221714666c50d73876
 # kakao
 kakao:
   client-id: ${KAKAO_CLIENT_ID}

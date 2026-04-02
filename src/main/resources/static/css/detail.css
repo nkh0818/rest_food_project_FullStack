@@ -1,0 +1,16 @@
+body { font-family: sans-serif; margin: 20px; color: #333; }
+.container { max-width: 800px; margin: 0 auto; }
+.tabs { display: flex; gap: 10px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+.tab-btn { padding: 10px 20px; border: none; background: #f4f4f4; cursor: pointer; border-radius: 5px; }
+.tab-btn.active { background: #007bff; color: white; }
+
+.content-wrapper { display: flex; margin-top: 20px; border: 1px solid #eee; height: 400px; }
+.side-list { width: 30%; border-right: 1px solid #eee; overflow-y: auto; }
+.menu-board { width: 70%; padding: 20px; overflow-y: auto; }
+
+.list-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; }
+.list-item:hover { background: #f9f9f9; }
+.list-item.selected { background: #e7f1ff; color: #007bff; font-weight: bold; }
+
+.menu-card { padding: 10px; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 5px; }
+.best-tag { color: red; font-size: 0.8em; font-weight: bold; }

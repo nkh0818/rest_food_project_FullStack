@@ -253,7 +253,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void saveFoodMappingIfNotExists(String keyword, String normalizedName, String categoryCode) {
-        // findAll() 대신 existsByKeyword 사용!
+        // findAll() 대신 existsByKeyword 사용! 0402나다희
         if (foodNameMappingRepository.existsByKeyword(keyword)) {
             return;
         }

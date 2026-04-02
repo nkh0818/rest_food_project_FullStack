@@ -31,10 +31,8 @@ public class NicknameGenerator {
     String noun = nounList.get(random.nextInt(nounList.size()));
     int number = random.nextInt(100, 1000);
 
-    // 3. 변수에 담기 (이게 핵심!)
     String finalNickname = String.format("%s_%s_%d", adj, noun, number);
 
-    // 4. 로그로 정체 확인하기
     log.info("🎯 생성된 랜덤 닉네임: [{}]", finalNickname);
 
     return finalNickname;

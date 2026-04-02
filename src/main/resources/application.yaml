@@ -35,15 +35,23 @@ spring:
 logging:
   level:
     com.yonsai.rest_food_project: info
-    org.hibernate.SQL: debug
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: INFO
     org.hibernate.type.descriptor.sql: trace
 
 # 공공데이터 API 키 등 커스텀 설정
 road-service-key: ${ROAD_SERVICE_KEY}
+YoutubeKey: asd
 kakaoNaviKey: ${KAKAO_NAVI}
-YoutubeKey: ${YOUTUBE_KEY}
 # kakao
 kakao:
-  client-id: ${KAKAO_CLIENT_ID:내_애플리케이션_REST_API_키}
+  client-id: ${KAKAO_CLIENT_ID}
   redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:3000/login/oauth2/code/kakao}
-  client-secret: ${KAKAO_CLIENT_SECRET:필요시_설정_내내_발급받은_비밀키}
+  client-secret: ${KAKAO_CLIENT_SECRET}
+
+jwt:
+  secret: ${JWT_SECRET}
+
+nickname:
+  adjectives: 배고픈,바삭한,졸린,질주하는,짭짤한
+  nouns: 호두과자,소떡소떡,알감자,델리만쥬,통감자,오징어

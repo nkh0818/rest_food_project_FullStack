@@ -7,5 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.yonsai.rest_food_project.domain.restArea.entity.Food;
 
 public interface FoodRepository extends JpaRepository<Food, Long> {
+
     List<Food> findByRestAreaId(Long restAreaId);
+
+    List<Food> findByCategoryCode(String categoryCode);
+
 }

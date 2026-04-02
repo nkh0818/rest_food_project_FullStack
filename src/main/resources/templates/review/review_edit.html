@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>리뷰 수정</title>
+
+<style>
+body {
+    font-family: Arial;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.star {
+    font-size: 30px;
+    cursor: pointer;
+    color: lightgray;
+}
+
+textarea {
+    width: 100%;
+    height: 80px;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.btn-group {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.tag-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* ⭐ 4개 고정 */
+    gap: 8px;
+}
+
+.tag-btn {
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+.custom-alert {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.alert-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.tag-btn {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.2s;
+}
+
+.tag-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+    font-weight: bold;
+}
+
+.tag-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.hash-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    margin: 4px;
+    background-color: #e8f5e9;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.remove-btn {
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>리뷰 수정</h2>
+
+<!-- 별점 -->
+<div id="starRating">
+    <span class="star" data-value="1">☆</span>
+    <span class="star" data-value="2">☆</span>
+    <span class="star" data-value="3">☆</span>
+    <span class="star" data-value="4">☆</span>
+    <span class="star" data-value="5">☆</span>
+</div>
+
+<form id="editForm">
+    <textarea id="content" placeholder="내용"></textarea>
+    <div class="tag-container">
+    <div class="tag-list">
+        <span class="tag-btn" onclick="selectBaseTag('맛있어요', this)">👍 맛있어요</span>
+        <span class="tag-btn" onclick="selectBaseTag('별로', this)">😐 별로</span>
+        <span class="tag-btn" onclick="selectBaseTag('양 많음', this)">🍚 양 많음</span>
+        <span class="tag-btn" onclick="selectBaseTag('청결해요', this)">🧼 깨끗해요</span>
+    </div>
+
+    <input type="text" id="tagInput" placeholder="태그 입력 후 Enter" onkeydown="handleTagInput(event)">
+    <div id="selectedTags"></div>
+</div>
+
+    <div class="btn-group">
+        <button type="submit" class="save-btn">수정 완료</button>
+        <button type="button" class="delete-btn" onclick="deleteReview()">삭제</button>
+    </div>
+</form>
+</div>
+
+<!-- alert -->
+<div id="customAlert" class="custom-alert">
+    <div class="alert-box">
+        <p id="alertMessage"></p>
+        <button onclick="closeAlert()">확인</button>
+    </div>
+</div>
+
+<script>
+let selectedTags = [];
+
+function selectBaseTag(tag, el) {
+    if (selectedTags.includes(tag)) {
+        selectedTags = selectedTags.filter(t => t !== tag);
+        el.classList.remove("active");
+    } else {
+        selectedTags.push(tag);
+        el.classList.add("active");
+    }
+    renderTags();
+}
+
+function handleTagInput(e) {
+    if (e.key === "Enter" || e.key === " " || e.key === ",") {
+        e.preventDefault();
+
+        const input = document.getElementById("tagInput");
+        const tag = input.value.trim();
+
+        if (tag && !selectedTags.includes(tag)) {
+            selectedTags.push(tag);
+            renderTags();
+        }
+
+        input.value = "";
+    }
+}
+
+function renderTags() {
+    const container = document.getElementById("selectedTags");
+
+    if (selectedTags.length === 0) {
+        container.innerHTML = "";
+        return;
+    }
+
+    container.innerHTML =
+        selectedTags.map(t =>
+            `<span class="hash-tag" onclick="removeTag('${t}')">${t}</span>`
+        ).join("");
+}
+
+function removeTag(tag) {
+    selectedTags = selectedTags.filter(t => t !== tag);
+
+    document.querySelectorAll(".tag-btn").forEach(btn => {
+        if (btn.textContent.includes(tag)) {
+            btn.classList.remove("active");
+        }
+    });
+
+    renderTags();
+}
+
+const reviewId = new URLSearchParams(location.search).get("id");
+let selectedRating = 0;
+
+if (!reviewId) {
+    alert("잘못된 접근입니다.");
+    location.href = "/review";
+}
+
+/* 별점 클릭 */
+document.querySelectorAll(".star").forEach(star => {
+    star.addEventListener("click", function () {
+        const clickedValue = Number(this.dataset.value);
+
+        if (selectedRating === clickedValue) {
+            selectedRating = Math.max(1, clickedValue - 1);
+        } else {
+            selectedRating = clickedValue;
+        }
+
+        highlightStars(selectedRating);
+    });
+});
+
+function highlightStars(rating) {
+    document.querySelectorAll(".star").forEach((star, i) => {
+        star.textContent = i < rating ? "★" : "☆";
+        star.style.color = i < rating ? "gold" : "lightgray";
+    });
+}
+
+/* 기존 데이터 불러오기 */
+fetch(`/api/reviews/${reviewId}`)
+    .then(res => res.json())
+    .then(data => {
+    console.log("응답 데이터:", data);
+
+    // 내용
+    document.getElementById("content").value = data.content || "";
+
+    // 태그 
+    let tagValue = "";
+
+ // 태그 초기화
+    if (data.tags && Array.isArray(data.tags)) {
+    	selectedTags = data.tags.slice();
+    } else if (data.tag) {
+        selectedTags = data.tag.split(",");
+    }
+
+    // 버튼 active 처리
+    document.querySelectorAll(".tag-btn").forEach(btn => {
+    	const tagText = btn.textContent.split(" ").pop();
+
+    	btn.classList.remove("active"); // 초기화
+
+    	if (selectedTags.includes(tagText)) {
+        	btn.classList.add("active");
+    	}
+	});
+
+    // 화면 렌더링
+    renderTags();
+
+    // 별점
+    selectedRating = data.rating || 1;
+    highlightStars(selectedRating);
+})
+
+document.getElementById("editForm").addEventListener("submit", function(e) {
+    e.preventDefault();S
+
+    fetch(`/api/reviews/${reviewId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            content: document.querySelector("#content").value,
+            rating: selectedRating,
+            tag: selectedTags.join(",")
+        })
+    })
+    .then(res => {
+    	if (!res.ok) throw new Error("수정 실패");
+	})
+	.then(() => {
+    	alert("수정 완료");
+    	window.location.href = "/review";
+	})
+    .catch(err => {
+        console.error(err);
+        showAlert("수정 실패");
+    });
+});
+
+/* 삭제 */
+function deleteReview() {
+    fetch(`/api/reviews/${reviewId}`, {
+        method: "DELETE"
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("삭제 실패");
+        showAlert("삭제 완료되었습니다.");
+        setTimeout(() => {
+            location.href = "/review";
+        }, 1000);
+    })
+    .catch(err => {
+        console.error(err);
+        showAlert("삭제 실패");
+    });
+}
+
+/* alert */
+function showAlert(message) {
+    document.getElementById("alertMessage").innerText = message;
+    document.getElementById("customAlert").style.display = "flex";
+}
+
+function closeAlert() {
+    document.getElementById("customAlert").style.display = "none";
+}
+</script>
+
+</body>
+</html>

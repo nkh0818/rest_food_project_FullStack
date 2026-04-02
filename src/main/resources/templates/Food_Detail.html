@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>휴게소 상세 정보</title>
+    <link rel="stylesheet" href="css/detail.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="restName">로딩 중...</h1>
+            <p id="restRoute"></p>
+        </header>
+        
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="loadTab('food')">식당가</button>
+            <button class="tab-btn" onclick="loadTab('brand')">브랜드</button>
+        </nav>
+
+        <div class="content-wrapper">
+            <aside class="side-list" id="shopList"></aside>
+            <main class="menu-board" id="menuBoard">
+                <p>매장을 선택해 주세요.</p>
+            </main>
+        </div>
+    </div>
+    <script src="js/rest_main.js"></script>
+</body>
+</html>

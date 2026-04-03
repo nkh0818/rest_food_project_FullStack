@@ -40,8 +40,8 @@ public class DataInitController {
         eventService.fetchAndSaveAllEvents();
         return "이벤트 데이터 수집 완료!";
     }
-    // http://localhost:8080/init-oil
-    // http://localhost:8080/init-foods
     // http://localhost:8080/init-data-reg
+    // http://localhost:8080/init-foods
+    // http://localhost:8080/init-oil
     // http://localhost:8080/init-events 휴게소 이벤트들
 }

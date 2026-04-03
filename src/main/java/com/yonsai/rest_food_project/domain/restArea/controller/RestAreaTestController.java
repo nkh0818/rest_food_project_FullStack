@@ -79,27 +79,6 @@ public class RestAreaTestController {
         return combinedResult;
     }
 
-    // @GetMapping("/detail/{stdRestCd}")
-    // public ResponseEntity<Map<String, Object>> getRestAreaDetail(@PathVariable
-    // String stdRestCd) {
-    // Optional<RestArea> optionalArea =
-    // restAreaRepository.findByStdRestCd(stdRestCd);
-    // if (!optionalArea.isPresent()) {
-    // return ResponseEntity.notFound().build();
-    // }
-    // RestArea restArea = optionalArea.get();
-
-    // // 이 휴게소의 음식, 이벤트 찾아오기
-    // List<Food> foods = foodRepository.findByRestAreaId(restArea.getId());
-    // List<RestAreaEvent> events = eventRepository.findByStdRestCd(stdRestCd);
-
-    // Map<String, Object> result = new HashMap<>();
-    // result.put("info", restArea);
-    // result.put("food", foods);
-    // result.put("events", events);
-
-    // return ResponseEntity.ok(result);
-    // }
     @GetMapping("/detail/{stdRestCd}")
     public ResponseEntity<Map<String, Object>> getRestAreaDetail(@PathVariable String stdRestCd) {
         Optional<RestArea> optionalArea = restAreaRepository.findByStdRestCd(stdRestCd);

@@ -5,15 +5,10 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-
-
 @Entity
-@Table(
-    name = "user_title",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "title_id"})
-    }
-)
+@Table(name = "user_title", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "user_id", "title_id" })
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,6 +29,15 @@ public class UserTitle {
     @JoinColumn(name = "title_id", nullable = false)
     private Title title;
 
-    @Column(name = "acquired_at")
-    private LocalDateTime acquiredAt;
+    @Builder.Default
+    @Column(name = "is_representative")
+    private Boolean isRepresentative = false;
+
+    @Column(name = "earned_at")
+    private LocalDateTime earnedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.earnedAt = LocalDateTime.now();
+    }
 }

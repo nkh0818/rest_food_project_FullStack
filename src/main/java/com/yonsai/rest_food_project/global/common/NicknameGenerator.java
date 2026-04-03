@@ -14,10 +14,17 @@ public class NicknameGenerator {
 
     private final NicknameProperties nicknameProperties;
 
-    public String generate(){
+    public String generate() {
 
-        List<String> adjs = new ArrayList<>(nicknameProperties.getAdjectives());
-        List<String> nouns = new ArrayList<>(nicknameProperties.getNouns());
+        List<String> adjList = nicknameProperties.getAdjectives() != null
+                ? nicknameProperties.getAdjectives()
+                : List.of("신난");
+        List<String> nounList = nicknameProperties.getNouns() != null
+                ? nicknameProperties.getNouns()
+                : List.of("여행자");
+
+        List<String> adjs = new ArrayList<>(adjList);
+        List<String> nouns = new ArrayList<>(nounList);
 
         Collections.shuffle(adjs);
         Collections.shuffle(nouns);
@@ -25,7 +32,7 @@ public class NicknameGenerator {
         String adj = adjs.get(0);
         String noun = nouns.get(0);
 
-        int number = (int)(Math.random() * 900) + 100;
+        int number = (int) (Math.random() * 900) + 100;
 
         return String.format("%s_%s_%d", adj, noun, number);
     }

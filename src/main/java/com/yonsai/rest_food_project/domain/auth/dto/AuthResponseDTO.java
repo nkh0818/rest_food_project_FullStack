@@ -11,5 +11,6 @@ public class AuthResponseDTO {
     private String accessToken;
     private String nickname;
     private String email;
+    private String password;
     private int level;
 }

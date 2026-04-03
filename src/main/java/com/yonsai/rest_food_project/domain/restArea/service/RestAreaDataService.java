@@ -6,6 +6,7 @@ import com.yonsai.rest_food_project.domain.restArea.entity.Food;
 import com.yonsai.rest_food_project.domain.restArea.entity.RestArea;
 import com.yonsai.rest_food_project.domain.restArea.repository.FoodRepository;
 import com.yonsai.rest_food_project.domain.restArea.repository.RestAreaRepository;
+import com.yonsai.rest_food_project.global.common.RedisService;
 import com.yonsai.rest_food_project.domain.restArea.dto.RestAreaResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,8 @@ public class RestAreaDataService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
 
+    private final RedisService redisService;
+
     private List<RestAreaResponseDto> originalData = new ArrayList<>();
     private List<RestAreaResponseDto> currentSearchResult = new ArrayList<>();
 
@@ -46,6 +49,11 @@ public class RestAreaDataService {
     // ================= [검색/필터/매칭 기능] =================
 
     public List<RestAreaResponseDto> search(String keyword) {
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            redisService.incrementSearchCount(keyword.trim());
+        } //0403 나다희 추가
+
         this.currentSearchResult = originalData.stream()
                 .filter(d -> d.getDbName().contains(keyword))
                 .collect(Collectors.toList());
@@ -266,35 +274,5 @@ public class RestAreaDataService {
                     return ascending ? Double.compare(priceA, priceB) : Double.compare(priceB, priceA);
                 })
                 .collect(Collectors.toList());
-    }
-
-    // 1. 휴게소 기초 정보 (매달 1일 새벽 2시 - 자주 안 바뀌므로)
-    @Scheduled(cron = "0 0 2 1 * *")
-    public void scheduledBasicInit() {
-        log.info("⏰ [스케줄러] 휴게소 기초 목록 업데이트 시작");
-        fetchRestAreaBasics();
-    }
-
-    // 매주 월요일(1) 새벽 3시에 실행
-    @Scheduled(cron = "0 0 3 * * 1")
-    public void scheduledFoodInit() {
-        log.info("⏰ [스케줄러] 음식 데이터 전체 수집 시작");
-        fetchAndSaveAllData();
-    }
-
-    // 3. 실시간 유가 (매일 새벽 5시)
-    @Scheduled(cron = "0 0 5 * * *")
-    public void scheduledOilInit() {
-        log.info("⏰ [스케줄러] 유가 정보 업데이트 시작");
-        updateOilPricesOnly();
-    }
-
-    // 4. 휴게소 이벤트 (매일 새벽 5시)
-    private final RestAreaEventService eventService;
-
-    @Scheduled(cron = "0 0 5 * * *")
-    public void scheduledEventInit() {
-        log.info("⏰ [스케줄러] 이벤트 정보 수집 시작");
-        eventService.fetchAndSaveAllEvents();
     }
 }

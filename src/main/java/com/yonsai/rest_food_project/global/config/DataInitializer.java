@@ -1,6 +1,8 @@
 package com.yonsai.rest_food_project.global.config;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.yonsai.rest_food_project.domain.restArea.entity.FoodCategory;
@@ -9,8 +11,11 @@ import com.yonsai.rest_food_project.domain.restArea.repository.FoodCategoryRepos
 import com.yonsai.rest_food_project.domain.restArea.repository.FoodNameMappingRepository;
 import com.yonsai.rest_food_project.domain.user.entity.Reward;
 import com.yonsai.rest_food_project.domain.user.entity.Title;
+import com.yonsai.rest_food_project.domain.user.entity.User;
+import com.yonsai.rest_food_project.domain.user.entity.UserRole;
 import com.yonsai.rest_food_project.domain.user.repository.RewardRepository;
 import com.yonsai.rest_food_project.domain.user.repository.TitleRepository;
+import com.yonsai.rest_food_project.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataInitializer implements CommandLineRunner {
 
+    private final UserRepository userRepository;
     private final TitleRepository titleRepository;
     private final RewardRepository rewardRepository;
     private final FoodCategoryRepository foodCategoryRepository;

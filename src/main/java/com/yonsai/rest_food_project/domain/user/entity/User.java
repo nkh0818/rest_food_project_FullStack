@@ -72,7 +72,19 @@ public class User {
     private Title currentTitle;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private UserRole role = UserRole.USER;
+
+    // security 권한 체크용
+    public String getRoleKey() {
+        return this.role.getKey();
+    }
+
+    // 관리자 여부 확인
+    public boolean isAdmin() {
+        return this.role == UserRole.ADMIN;
+    }
+
 
     // 사용자가 누른 추천 목록 조회
     @Builder.Default

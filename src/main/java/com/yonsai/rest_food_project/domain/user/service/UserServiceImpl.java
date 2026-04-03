@@ -9,6 +9,7 @@ import com.yonsai.rest_food_project.domain.user.entity.User;
 import com.yonsai.rest_food_project.domain.user.entity.UserRole;
 import com.yonsai.rest_food_project.domain.user.repository.UserRepository;
 import com.yonsai.rest_food_project.global.common.NicknameGenerator;
+import com.yonsai.rest_food_project.global.common.RedisService;
 import com.yonsai.rest_food_project.global.exception.RoadQuestException;
 
 import jakarta.transaction.Transactional;
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
     private final NicknameGenerator nicknameGenerator;
+    private final RedisService redisService;
 
     @Override
     @Transactional
@@ -40,10 +42,10 @@ public class UserServiceImpl implements UserService {
                 })
                 .orElseGet(() -> {
                     // 소셜 로그인 시 닉네임이 없으면 유니크 닉네임 생성
-                    String finalNickname = (nickname == null || nickname.trim().isEmpty()) 
-                                           ? generateUniqueNickname() 
-                                           : nickname;
-                    
+                    String finalNickname = (nickname == null || nickname.trim().isEmpty())
+                            ? generateUniqueNickname()
+                            : nickname;
+
                     User newUser = User.builder()
                             .email(email)
                             .nickname(finalNickname)
@@ -59,9 +61,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createLocalUser(String email, String encodedPassword, String nickname) {
-        String finalNickname = (nickname == null || nickname.trim().isEmpty()) 
-                               ? generateUniqueNickname() 
-                               : nickname;
+        String finalNickname = (nickname == null || nickname.trim().isEmpty())
+                ? generateUniqueNickname()
+                : nickname;
 
         log.info(">>>> [로컬 가입] 최종 닉네임: {}", finalNickname);
 
@@ -79,17 +81,23 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User nicknameUpdate(Long userId, String newNickname) {
-        // 1. 중복 확인
-        if (userRepo.existsByNickname(newNickname)) {
-            throw new RoadQuestException("이미 사용중인 닉네임입니다!");
-        }
 
-        // 2. 유저 조회
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RoadQuestException("사용자를 찾을 수 없습니다. ID: " + userId));
 
-        // 3. 닉네임 변경 (더티 체킹 발생)
+        String oldNickname = user.getNickname();
+
+        // 1. 중복 확인
+        if (userRepo.existsByNickname(newNickname) || redisService.isNicknameExists(newNickname)) {
+            throw new RoadQuestException("이미 사용중인 닉네임입니다!");
+        }
+
         user.setNickname(newNickname);
+
+        redisService.deleteNickname(oldNickname);
+        redisService.saveNickname(newNickname);
+
+        log.info("닉네임 변경 완료: {} -> {}", oldNickname, newNickname);
 
         // 4. 수정된 객체 반환 (AuthServiceImpl에서 사용하기 위함)
         return user;

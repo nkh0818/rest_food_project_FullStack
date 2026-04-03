@@ -1,5 +1,7 @@
 package com.yonsai.rest_food_project.domain.user.dto;
 
+import java.util.List;
+
 import com.yonsai.rest_food_project.domain.user.entity.User;
 
 import lombok.AllArgsConstructor;
@@ -13,24 +15,34 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserResponseDTO {
 
-    /** FE로 보내주기 위해 필요한 정보만 적기 */
+    //0403 나다희 수정
 
-    private Long id;
-    private String email;
-    private String nickname;
-    private int xp;
-    private int level;
-    private String currentTitle; // 칭호 객체가 아니라 이름만 전달
+    private Long id;            //아이디
+    private String email;       //이메일
+    private String nickname;    //닉네임
+    private int xp;             //경험치
+    private int level;          //레벨
+    private int rewardPoint;    //포인트
+    private String currentTitle;//타이틀
 
-    public static UserResponseDTO from(User user){
+    private List<Long> reviewLikes;
+    private List<String> userTitles;
+
+    public static UserResponseDTO from(User user) {
         return UserResponseDTO.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .xp(user.getXp())
                 .level(user.getLevel())
+                .rewardPoint(user.getRewardPoint())
                 .currentTitle(user.getCurrentTitle() != null ?
-                                user.getCurrentTitle().getTitleName() : "칭호 없음")
+                              user.getCurrentTitle().getTitleName() : "칭호 없음")
+                // 엔티티 리스트를 ID나 이름 리스트로 변환
+                .reviewLikes(user.getReviewLikes().stream()
+                        .map(like -> like.getReview().getId()).toList())
+                .userTitles(user.getUserTitles().stream()
+                        .map(ut -> ut.getTitle().getTitleName()).toList())
                 .build();
     }
 }

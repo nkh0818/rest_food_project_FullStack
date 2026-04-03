@@ -10,6 +10,7 @@ import com.yonsai.rest_food_project.domain.user.entity.User;
 import com.yonsai.rest_food_project.domain.user.service.UserService;
 import com.yonsai.rest_food_project.global.auth.JwtProvider;
 import com.yonsai.rest_food_project.global.auth.KakaoApiModule;
+import com.yonsai.rest_food_project.global.common.RedisService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final KakaoApiModule kakaoApiModule;
     private final JwtProvider jwtProvider;
 
+    private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -73,6 +75,8 @@ public class AuthServiceImpl implements AuthService {
                 encodedPassword,
                 dto.getNickname());
 
+        redisService.saveNickname(user.getNickname());
+
         // 토큰 생성 및 반환
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getNickname());
 
@@ -114,9 +118,11 @@ public class AuthServiceImpl implements AuthService {
 
         User updatedUser = userService.nicknameUpdate(user.getId(), newNickname);
 
+        String newAccessToken = jwtProvider.createToken(updatedUser.getEmail(), updatedUser.getNickname());
+
         log.info("닉네임 변경 완료: email={}, newNickname={}", email, updatedUser.getNickname());
 
-        return convertToAuthResponse(updatedUser, accessToken);
+        return convertToAuthResponse(updatedUser, newAccessToken);
     }
 
     @Override

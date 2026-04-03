@@ -2,6 +2,7 @@ package com.yonsai.rest_food_project.domain.review.service;
 
 import java.util.List;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +59,21 @@ public class ReviewServiceImpl implements ReviewService {
                 .imageUrl(dto.getImageUrl())
                 .build();
 
-        return ReviewResponseDTO.from(reviewRepository.save(review));
+        // 0403 나다희 추가
+
+        Review savedReview = reviewRepository.save(review);
+
+        user.addActivityScore(30);
+
+        int newXp = user.getXp() + 10;
+        if (newXp >= 100) {
+            user.setLevel(user.getLevel() + 1);
+            user.setXp(newXp % 100);
+        } else {
+            user.setXp(newXp);
+        }
+
+        return ReviewResponseDTO.from(savedReview);
     }
 
     @Override
@@ -92,18 +107,28 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional
     @Override
-    public void updateReview(Long reviewId, ReviewUpdateRequestDTO dto) {
+    public void updateReview(Long reviewId, Long userId,ReviewUpdateRequestDTO dto) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new RoadQuestException("리뷰를 찾을 수 없습니다. ID: " + reviewId));
+            .orElseThrow(() -> new RoadQuestException("리뷰를 찾을 수 없습니다. ID: " + reviewId));
+
+        if (!review.getUser().getId().equals(userId)) {
+        throw new RoadQuestException("해당 리뷰를 수정할 권한이 없습니다.");
+    }
+
         review.update(dto.getContent(), dto.getRating(), dto.getTag());
     }
 
     @Transactional
     @Override
-    public void deleteReview(Long reviewId) {
+    public void deleteReview(Long reviewId, User currentUser) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new RoadQuestException("삭제할 리뷰가 존재하지 않습니다."));
-        reviewRepository.delete(review);
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 없습니다."));
+
+        if (review.getUser().getId().equals(currentUser.getId()) || currentUser.isAdmin()) {
+            reviewRepository.delete(review);
+        } else {
+            throw new AccessDeniedException("삭제 권한이 없습니다.");
+        }
     }
 
     @Override
@@ -163,12 +188,3 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewLikeRepository.existsByReviewIdAndUserId(reviewId, userId);
     }
 }
-
-
-/*
-N+1 문제 해결: 지금은 리뷰 개수가 적어 괜찮지만, 나중에 리뷰가 많아지면 getReviewsByRestArea의 루프 안에서 실행되는 existsBy... 쿼리가 성능 저하를 일으킬 수 있습니다.
-
-이미지 처리: 현재 imageUrl을 문자열로 받고 있는데, 실제로 이미지를 업로드하고 S3 같은 저장소의 URL을 받아오는 로직이 추가되면 ReviewService의 복잡도가 올라갈 수 있습니다.
-
-데이터 무결성: addLike()와 removeLike() 메서드 내부에 동시성 이슈를 방지하기 위한 로직을 고려해 보는 것도 좋은 공부가 될 것입니다.
-*/

@@ -2,6 +2,8 @@ package com.yonsai.rest_food_project.domain.restArea.controller;
 
 import com.yonsai.rest_food_project.domain.restArea.dto.RestAreaResponseDto;
 import com.yonsai.rest_food_project.domain.restArea.service.RestAreaDataService;
+import com.yonsai.rest_food_project.global.common.RedisService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,12 +15,15 @@ import java.util.List;
 public class RestAreaApiController {
 
     private final RestAreaDataService restAreaDataService;
+    private final RedisService redisService;
 
     /**
      * 1. 휴게소 이름으로 검색 (검색어 포함된 결과 반환)
      */
     @GetMapping("/search")
     public List<RestAreaResponseDto> search(@RequestParam String keyword) {
+        System.out.println("📢 검색 요청 들어옴: " + keyword);
+        redisService.incrementSearchCount(keyword);
         return restAreaDataService.search(keyword);
     }
 

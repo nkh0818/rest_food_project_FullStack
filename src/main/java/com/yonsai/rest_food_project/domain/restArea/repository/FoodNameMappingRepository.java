@@ -12,9 +12,6 @@ public interface FoodNameMappingRepository extends JpaRepository<FoodNameMapping
     List<FoodNameMapping> findAllByOrderByKeywordAsc();
 
     Optional<FoodNameMapping> findFirstByKeyword(String keyword);
-<<<<<<< HEAD
 
     boolean existsByKeyword(String keyword); // 키워드가 존재하는지만 체크 0402나다희 추가
-=======
->>>>>>> 40c2401ca08ce26ae06603221714666c50d73876
 }

@@ -2,7 +2,6 @@ package com.yonsai.rest_food_project.domain.user.service;
 
 import com.yonsai.rest_food_project.domain.user.dto.UserResponseDTO;
 import com.yonsai.rest_food_project.domain.user.entity.User;
-import com.yonsai.rest_food_project.domain.user.entity.UserRole;
 
 public interface UserService {
 

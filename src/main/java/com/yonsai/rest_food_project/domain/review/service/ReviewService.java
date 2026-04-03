@@ -5,6 +5,7 @@ import java.util.List;
 import com.yonsai.rest_food_project.domain.review.dto.ReviewRequestDTO;
 import com.yonsai.rest_food_project.domain.review.dto.ReviewResponseDTO;
 import com.yonsai.rest_food_project.domain.review.dto.ReviewUpdateRequestDTO;
+import com.yonsai.rest_food_project.domain.user.entity.User;
 
 public interface ReviewService {
 
@@ -16,9 +17,9 @@ public interface ReviewService {
 
     ReviewResponseDTO getReview(Long reviewId);
 
-    void updateReview(Long reviewId, ReviewUpdateRequestDTO dto);
+    void updateReview(Long reviewId, Long userId, ReviewUpdateRequestDTO dto);
 
-    void deleteReview(Long reviewId);
+    void deleteReview(Long reviewId, User currentUser);
 
     Double getAverageRating(Long restAreaId);
 

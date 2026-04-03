@@ -9,6 +9,7 @@ import com.yonsai.rest_food_project.domain.auth.dto.LoginRequestDTO;
 import com.yonsai.rest_food_project.domain.auth.dto.SignUpRequestDTO;
 import com.yonsai.rest_food_project.domain.auth.service.AuthService;
 import com.yonsai.rest_food_project.global.common.NicknameGenerator;
+import com.yonsai.rest_food_project.global.common.RedisService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
+
+    private final RedisService redisService;
 
     private final AuthService authService;
     private final NicknameGenerator nicknameGenerator;

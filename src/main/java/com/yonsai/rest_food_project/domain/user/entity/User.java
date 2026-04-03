@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.yonsai.rest_food_project.domain.review.entity.Review;
 import com.yonsai.rest_food_project.domain.review.entity.ReviewLike;
 
 import jakarta.persistence.*;
@@ -85,7 +86,6 @@ public class User {
         return this.role == UserRole.ADMIN;
     }
 
-
     // 사용자가 누른 추천 목록 조회
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -94,6 +94,11 @@ public class User {
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserTitle> userTitles = new ArrayList<>();
+
+    // 사용자가 작성한 리뷰 목록
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -21,8 +21,8 @@ public class ReviewRequestDTO {
     @NotBlank(message = "리뷰 내용을 입력해 주세요.")
     private String content;
 
-    @NotNull(message = "휴게소 정보가 존재하지 않습니다.")
-    private Long restAreaId;
+    @NotBlank(message = "휴게소 정보가 존재하지 않습니다.")
+    private String restAreaId;
 
     private Long foodId;
     private String imageUrl;

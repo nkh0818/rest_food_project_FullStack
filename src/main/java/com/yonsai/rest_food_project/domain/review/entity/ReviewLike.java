@@ -12,15 +12,9 @@ import com.yonsai.rest_food_project.domain.user.entity.User;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(
-    name = "review_likes",
-    uniqueConstraints = { // 하나의 review_id와 user_id만 매칭하겠다
-        @UniqueConstraint(
-            name = "uk_review_user",
-            columnNames = {"review_id", "user_id"}
-        )
-    }
-)
+@Table(name = "review_likes", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_review_user", columnNames = { "review_id", "user_id" })
+})
 public class ReviewLike {
 
     @Id
@@ -29,7 +23,7 @@ public class ReviewLike {
 
     // 어떤 리뷰?
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", nullable = false)
+    @JoinColumn(name = "review_id")
     private Review review;
 
     // 누가?

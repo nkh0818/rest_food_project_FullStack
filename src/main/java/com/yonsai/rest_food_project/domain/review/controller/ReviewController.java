@@ -53,6 +53,19 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewsByFood(foodId));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<List<ReviewResponseDTO>> getMyReviews(
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        
+        // 토큰에서 현재 로그인한 유저 ID 추출
+        Long userId = principalDetails.getUser().getId();
+        
+        // 서비스에서 내가 쓴 리뷰 목록 가져오기
+        List<ReviewResponseDTO> myReviews = reviewService.getMyReviews(userId);
+        
+        return ResponseEntity.ok(myReviews);
+    }
+
     // 내 리뷰 조회
     // 로그인 사용자 기준 조회
     @GetMapping("/{reviewId}")

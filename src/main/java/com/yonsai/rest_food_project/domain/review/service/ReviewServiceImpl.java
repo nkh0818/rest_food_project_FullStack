@@ -37,7 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RoadQuestException("사용자를 찾을 수 없습니다. ID: " + userId));
 
-        RestArea restArea = restAreaRepository.findById(dto.getRestAreaId())
+        RestArea restArea = restAreaRepository.findByStdRestCd(dto.getRestAreaId())
                 .orElseThrow(() -> new RoadQuestException("휴게소를 찾을 수 없습니다. ID: " + dto.getRestAreaId()));
 
         Food food = null;
@@ -64,8 +64,9 @@ public class ReviewServiceImpl implements ReviewService {
         Review savedReview = reviewRepository.save(review);
 
         user.addActivityScore(30);
+        user.setRewardPoint(user.getRewardPoint() + 100);
 
-        int newXp = user.getXp() + 10;
+        int newXp = user.getXp() + 30;
         if (newXp >= 100) {
             user.setLevel(user.getLevel() + 1);
             user.setXp(newXp % 100);
@@ -99,6 +100,16 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public List<ReviewResponseDTO> getMyReviews(Long userId) {
+        return reviewRepository.findByUserId(userId)
+                .stream()
+                .map(review -> {
+                    return ReviewResponseDTO.from(review);
+                })
+                .toList();
+    }
+
+    @Override
     public ReviewResponseDTO getReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RoadQuestException("리뷰를 찾을 수 없습니다. ID: " + reviewId));
@@ -107,13 +118,13 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional
     @Override
-    public void updateReview(Long reviewId, Long userId,ReviewUpdateRequestDTO dto) {
+    public void updateReview(Long reviewId, Long userId, ReviewUpdateRequestDTO dto) {
         Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new RoadQuestException("리뷰를 찾을 수 없습니다. ID: " + reviewId));
+                .orElseThrow(() -> new RoadQuestException("리뷰를 찾을 수 없습니다. ID: " + reviewId));
 
         if (!review.getUser().getId().equals(userId)) {
-        throw new RoadQuestException("해당 리뷰를 수정할 권한이 없습니다.");
-    }
+            throw new RoadQuestException("해당 리뷰를 수정할 권한이 없습니다.");
+        }
 
         review.update(dto.getContent(), dto.getRating(), dto.getTag());
     }

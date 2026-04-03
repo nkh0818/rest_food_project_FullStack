@@ -12,7 +12,7 @@ import com.yonsai.rest_food_project.global.common.NicknameGenerator;
 import com.yonsai.rest_food_project.global.common.RedisService;
 import com.yonsai.rest_food_project.global.exception.RoadQuestException;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -103,23 +103,30 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    // --- 이하 단순 조회 로직 (ReadOnly 최적화 가능) ---
+    // --- 이하 단순 조회 로직 ---
 
     @Override
+    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new RoadQuestException("사용자를 찾을 수 없습니다. email: " + email));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
         return userRepo.existsByEmail(email);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponseDTO getMyInfo(Long userId) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RoadQuestException("사용자를 찾을 수 없습니다. ID: " + userId));
+
+        int reviewCount = user.getReviews().size();
+        log.info(">>>> [내 정보 조회] 유저: {}, 리뷰 수: {}", user.getNickname(), user.getReviews().size());
+
         return UserResponseDTO.from(user);
     }
 

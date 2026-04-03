@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yonsai.rest_food_project.domain.restArea.entity.Food;
 import com.yonsai.rest_food_project.domain.restArea.entity.RestArea;
 import com.yonsai.rest_food_project.domain.user.entity.User;
@@ -24,10 +25,12 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rest_area_id", nullable = false) // 휴게소 전체 리뷰를 위해 추가
+    @JsonIgnore
     private RestArea restArea;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,8 +48,12 @@ public class Review {
     private String tag; // 맛있다, 별로다 등 태그
 
     @Column(name = "like_count")
-    @Builder.Default // 기본값 설정
+    @Builder.Default
     private int likeCount = 0;
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<ReviewLike> likes = new java.util.ArrayList<>();
 
     @Column(name = "report_count")
     @Builder.Default

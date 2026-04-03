@@ -23,6 +23,7 @@ public class UserResponseDTO {
     private int xp;             //경험치
     private int level;          //레벨
     private int rewardPoint;    //포인트
+    private int reviewCount;    //리뷰 수
     private String currentTitle;//타이틀
 
     private List<Long> reviewLikes;
@@ -38,11 +39,11 @@ public class UserResponseDTO {
                 .rewardPoint(user.getRewardPoint())
                 .currentTitle(user.getCurrentTitle() != null ?
                               user.getCurrentTitle().getTitleName() : "칭호 없음")
-                // 엔티티 리스트를 ID나 이름 리스트로 변환
                 .reviewLikes(user.getReviewLikes().stream()
                         .map(like -> like.getReview().getId()).toList())
                 .userTitles(user.getUserTitles().stream()
                         .map(ut -> ut.getTitle().getTitleName()).toList())
+                .reviewCount(user.getReviews().size())
                 .build();
     }
 }

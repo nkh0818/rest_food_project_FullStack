@@ -15,6 +15,8 @@ public interface ReviewService {
 
     List<ReviewResponseDTO> getReviewsByFood(Long foodId);
 
+    List<ReviewResponseDTO> getMyReviews(Long userId);
+
     ReviewResponseDTO getReview(Long reviewId);
 
     void updateReview(Long reviewId, Long userId, ReviewUpdateRequestDTO dto);

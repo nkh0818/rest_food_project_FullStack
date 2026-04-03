@@ -20,6 +20,7 @@ public class ReviewResponseDTO {
     // 휴게소, 음식 정보
     private Long restAreaId;
     private String restAreaName;
+    private String restAreaCode;
     private Long foodId;
     private String foodName;
 
@@ -48,6 +49,7 @@ public class ReviewResponseDTO {
                 .nickname(review.getUser() != null ? review.getUser().getNickname() : "알 수 없음")
                 .restAreaId(review.getRestArea() != null ? review.getRestArea().getId() : null)
                 .restAreaName(review.getRestArea() != null ? review.getRestArea().getName() : null)
+                .restAreaCode(review.getRestArea() != null ? review.getRestArea().getStdRestCd() : null)
                 .foodId(review.getFood() != null ? review.getFood().getId() : null)
                 .foodName(review.getFood() != null ? review.getFood().getFoodName() : null)
                 .content(review.getContent())
@@ -70,6 +72,7 @@ public class ReviewResponseDTO {
                 .nickname(review.getUser() != null ? review.getUser().getNickname() : "알 수 없음")
                 .restAreaId(review.getRestArea() != null ? review.getRestArea().getId() : null)
                 .restAreaName(review.getRestArea() != null ? review.getRestArea().getName() : null)
+                .restAreaCode(review.getRestArea() != null ? review.getRestArea().getStdRestCd() : null)
                 .foodId(review.getFood() != null ? review.getFood().getId() : null)
                 .foodName(review.getFood() != null ? review.getFood().getFoodName() : null)
                 .content(review.getContent())

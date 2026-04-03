@@ -150,6 +150,9 @@ public class AuthServiceImpl implements AuthService {
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .level(user.getLevel())
+                .xp(user.getXp())
+                .rewardPoint(user.getRewardPoint())
+                .reviewCount(user.getReviews().size())
                 .build();
     }
 

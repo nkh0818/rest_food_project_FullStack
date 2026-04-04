@@ -13,6 +13,9 @@ import com.yonsai.rest_food_project.domain.restArea.service.RestAreaDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/restareas")
 @RequiredArgsConstructor
@@ -35,11 +37,13 @@ public class RestAreaTestController {
     private final FoodRepository foodRepository;
     private final RestAreaEventRepository eventRepository;
 
+    /**
+     * 경로 검색 (카카오 내비 기반 + DB 매칭)
+     */
     @GetMapping("/search")
     public List<RestAreaResponseDto> search(@RequestParam String start, @RequestParam String end) {
         Map<String, Object> routeData = kakaoNaviService.getRouteWithRestAreas(start, end);
-        if (routeData == null)
-            return new ArrayList<>();
+        if (routeData == null) return new ArrayList<>();
 
         List<Map<String, String>> kakaoRestAreas = (List<Map<String, String>>) routeData.get("restAreas");
         List<RestAreaResponseDto> combinedResult = new ArrayList<>();
@@ -52,78 +56,22 @@ public class RestAreaTestController {
             RestAreaResponseDto dbInfo = restAreaDataService.findBestMatch(name, x, y);
 
             if (dbInfo != null) {
-                String coreName = dbInfo.getDbName() != null ? dbInfo.getDbName() : name;
-                coreName = coreName.replaceAll("휴게소", "").replaceAll("주유소", "").replaceAll(" ", "").trim();
-
-                List<RestArea> matchingStations = restAreaRepository.findByNameContaining(coreName);
-                for (RestArea entity : matchingStations) {
-                    // 1. 휴게소 본체인 경우 -> 진짜 휴게소 코드(stdRestCd)를 세팅함
-                    if (!entity.getName().contains("주유소") && !entity.getName().contains("충전소")) {
-                        dbInfo.setStdRestCd(entity.getStdRestCd());
-                    }
-                    // 2. 주유소인 경우 -> 유가 정보를 덮어씀
-                    if (entity.getName().contains("주유소") || entity.getName().contains("충전소")) {
-                        if (entity.getGasolinePrice() != null && entity.getGasolinePrice() > 0) {
-                            dbInfo.setGasolinePrice(Double.valueOf(entity.getGasolinePrice()));
-                            dbInfo.setDieselPrice(Double.valueOf(entity.getDiselPrice()));
-                            dbInfo.setLpgPrice(Double.valueOf(entity.getLpgPrice()));
-                            if (entity.getOilCompany() != null && !entity.getOilCompany().isEmpty()) {
-                                dbInfo.setType(entity.getOilCompany());
-                            }
-                        }
-                    }
-                }
                 combinedResult.add(dbInfo);
             }
         }
         return combinedResult;
     }
 
-    // @GetMapping("/detail/{stdRestCd}")
-    // public ResponseEntity<Map<String, Object>> getRestAreaDetail(@PathVariable
-    // String stdRestCd) {
-    // Optional<RestArea> optionalArea =
-    // restAreaRepository.findByStdRestCd(stdRestCd);
-    // if (!optionalArea.isPresent()) {
-    // return ResponseEntity.notFound().build();
-    // }
-    // RestArea restArea = optionalArea.get();
-
-    // // 이 휴게소의 음식, 이벤트 찾아오기
-    // List<Food> foods = foodRepository.findByRestAreaId(restArea.getId());
-    // List<RestAreaEvent> events = eventRepository.findByStdRestCd(stdRestCd);
-
-    // Map<String, Object> result = new HashMap<>();
-    // result.put("info", restArea);
-    // result.put("food", foods);
-    // result.put("events", events);
-
-    // return ResponseEntity.ok(result);
-    // }
+    /**
+     * 상세페이지 (음식, 이벤트, 머지된 유가 정보 포함)
+     */
     @GetMapping("/detail/{stdRestCd}")
     public ResponseEntity<Map<String, Object>> getRestAreaDetail(@PathVariable String stdRestCd) {
-        Optional<RestArea> optionalArea = restAreaRepository.findByStdRestCd(stdRestCd);
-        if (!optionalArea.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        // 휴게소 정보 가져오기
+        RestArea restArea = restAreaRepository.findByStdRestCd(stdRestCd)
+                .orElseThrow(() -> new RuntimeException("휴게소를 찾을 수 없습니다."));
 
-        // DB에서 휴게소 정보 꺼내기
-        RestArea restArea = optionalArea.get();
-        String coreName = restArea.getName().replaceAll("휴게소", "").replaceAll("주유소", "").replaceAll(" ", "").trim();
-        List<RestArea> matchingStations = restAreaRepository.findByNameContaining(coreName);
-
-        for (RestArea station : matchingStations) {
-            if (station.getName().contains("주유소") || station.getName().contains("충전소")) {
-                // 주유소의 가격 정보를 휴게소 객체에 덮어쓰기
-                restArea.setGasolinePrice(station.getGasolinePrice());
-                restArea.setDiselPrice(station.getDiselPrice());
-                restArea.setLpgPrice(station.getLpgPrice());
-                restArea.setOilCompany(station.getOilCompany());
-                break;
-            }
-        }
-
-        // 3. 음식과 이벤트 찾기
+        // 음식과 이벤트 찾기
         List<Food> foods = foodRepository.findByRestAreaId(restArea.getId());
         List<RestAreaEvent> events = eventRepository.findByStdRestCd(stdRestCd);
 
@@ -133,5 +81,27 @@ public class RestAreaTestController {
         result.put("events", events);
 
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 3. 랜덤 휴게소 리스트 (0404 나다희 추가)
+     */
+    @GetMapping("/random")
+    public ResponseEntity<Page<RestAreaResponseDto>> getRandomRestAreas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(restAreaDataService.getRandomAreas(page, size));
+    }
+
+    /**
+     * 4. 이름 검색 (일반 검색창용)
+     */
+    @GetMapping("/search-name")
+    public ResponseEntity<Page<RestAreaResponseDto>> searchByRestAreaName(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        log.info("🔍 휴게소 이름 검색 시작: keyword={}, page={}", keyword, page);
+        return ResponseEntity.ok(restAreaDataService.searchAreas(keyword, page, size));
     }
 }

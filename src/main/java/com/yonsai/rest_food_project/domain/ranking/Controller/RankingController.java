@@ -1,6 +1,7 @@
 package com.yonsai.rest_food_project.domain.ranking.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yonsai.rest_food_project.global.common.RedisService;
@@ -12,12 +13,21 @@ import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/api/ranking")
 @RequiredArgsConstructor
 public class RankingController {
     private final RedisService redisService;
+
+    @PostMapping("/record")
+    public ResponseEntity<Void> recordSearchKeyword(@RequestParam String keyword) {
+        redisService.incrementSearchCount(keyword);
+        return ResponseEntity.ok().build();
+    }
+
+    // -----------조회------------
 
     // 상위 10개 키워드 가져오기
     @GetMapping("/search")

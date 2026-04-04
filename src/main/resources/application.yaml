@@ -54,7 +54,6 @@ logging:
     org.hibernate.SQL: info
     org.hibernate.orm.jdbc.bind: INFO
     org.hibernate.type.descriptor.sql: trace
-    com.yonsai.rest_food_project.global.config.DataInitializer: WARN
 
 # 공공데이터 API 키 등 커스텀 설정
 road-service-key: ${ROAD_SERVICE_KEY}

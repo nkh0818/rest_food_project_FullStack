@@ -22,7 +22,7 @@ public class KakaoNaviService {
     private final String LOCAL_URL = "https://dapi.kakao.com/v2/local/search/keyword.json"; // 장소 검색 API 추가
 
     // ⭐ 1. 한글 장소명(예: "서울역")을 좌표("127.123,37.123")로 바꿔주는 로직 추가
-    private String getCoordinates(String keyword) {
+    public String getCoordinates(String keyword) {
         // 만약 '내 위치' 버튼을 눌러서 이미 좌표(숫자)로 들어왔다면 변환 없이 바로 통과시킴
         if (keyword.matches("^[0-9]+\\.[0-9]+,[0-9]+\\.[0-9]+$")) {
             return keyword;
@@ -72,6 +72,8 @@ public class KakaoNaviService {
         headers.set("Content-Type", "application/json");
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        log.info("🚀 길찾기 요청 좌표 확인 -> 출발: {}, 도착: {}", originCoords, destCoords);
 
         // 네비 API 호출 (이제 한글 이름 대신 변환된 좌표가 들어갑니다)
         String url = UriComponentsBuilder.fromHttpUrl(NAVI_URL)

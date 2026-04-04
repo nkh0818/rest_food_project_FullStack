@@ -90,6 +90,7 @@ public class User {
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLikes = new ArrayList<>();
+    
     // 사용자가 획득한 칭호 목록
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -2,6 +2,9 @@ package com.yonsai.rest_food_project.domain.review.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.yonsai.rest_food_project.domain.review.dto.ReviewRequestDTO;
 import com.yonsai.rest_food_project.domain.review.dto.ReviewResponseDTO;
 import com.yonsai.rest_food_project.domain.review.dto.ReviewUpdateRequestDTO;
@@ -18,6 +21,8 @@ public interface ReviewService {
     List<ReviewResponseDTO> getMyReviews(Long userId);
 
     ReviewResponseDTO getReview(Long reviewId);
+
+    Page<ReviewResponseDTO> getCommunityReviews(Pageable pageable);
 
     void updateReview(Long reviewId, Long userId, ReviewUpdateRequestDTO dto);
 

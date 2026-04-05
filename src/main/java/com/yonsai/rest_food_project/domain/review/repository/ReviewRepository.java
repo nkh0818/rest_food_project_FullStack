@@ -2,6 +2,8 @@ package com.yonsai.rest_food_project.domain.review.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,6 +11,11 @@ import org.springframework.data.repository.query.Param;
 import com.yonsai.rest_food_project.domain.review.entity.Review;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+
+
+    // 커뮤니티 전체 피드용
+    // 호출할 때 PageRequest.of(0, 10, Sort.by("createdAt").descending())
+    Page<Review> findAll(Pageable pageable);
 
     List<Review> findByRestAreaId(Long restAreaId);
 

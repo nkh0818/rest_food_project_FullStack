@@ -102,21 +102,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public AuthResponseDTO updateNickname(String accessToken, String newNickname) {
+    public AuthResponseDTO updateNickname(String accessToken, String newNickname, String profileImage) {
         log.info("---닉네임 변경 프로세스 시작---");
 
         // 1. 토큰 정제 및 이메일 추출
-        String jwtToken = accessToken;
-        if (accessToken != null && accessToken.startsWith("Bearer ")) {
-            jwtToken = accessToken.substring(7);
-        }
-
+        String jwtToken = accessToken.startsWith("Bearer ") ? accessToken.substring(7) : accessToken;
         String email = jwtProvider.getEmailFromToken(jwtToken);
 
-        // 2. 유저 조회 후 닉네임 변경
+        // 2. 유저 조회
         User user = userService.findByEmail(email);
-
-        User updatedUser = userService.nicknameUpdate(user.getId(), newNickname);
+        // 이렇게 해야 ServiceImpl의 nicknameUpdate에서 기존 사진을 유지하며 DB에 반영합니다.
+        User updatedUser = userService.nicknameUpdate(user.getId(), newNickname, profileImage);
 
         String newAccessToken = jwtProvider.createToken(updatedUser.getEmail(), updatedUser.getNickname());
 
@@ -149,6 +145,7 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .nickname(user.getNickname())
                 .email(user.getEmail())
+                .profileImage(user.getProfileImage())
                 .level(user.getLevel())
                 .xp(user.getXp())
                 .rewardPoint(user.getRewardPoint())

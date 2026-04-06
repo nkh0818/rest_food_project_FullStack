@@ -2,6 +2,8 @@ package com.yonsai.rest_food_project.domain.review.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +77,14 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return ReviewResponseDTO.from(savedReview);
+    }
+
+    // 커뮤니티 전체 피드 조회
+    @Transactional(readOnly = true)
+    @Override
+    public Page<ReviewResponseDTO> getCommunityReviews(Pageable pageable) {
+       Page<Review> reviews = reviewRepository.findAll(pageable);
+       return reviews.map(ReviewResponseDTO::from);
     }
 
     @Override

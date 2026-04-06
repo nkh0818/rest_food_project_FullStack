@@ -18,6 +18,5 @@ public interface AuthService {
     AuthResponseDTO getMe(String token);
 
     // 닉네임 업데이트
-    AuthResponseDTO updateNickname(String accessToken, String newNickname);
-
+    AuthResponseDTO updateNickname(String accessToken, String newNickname, String profileImage);
 }

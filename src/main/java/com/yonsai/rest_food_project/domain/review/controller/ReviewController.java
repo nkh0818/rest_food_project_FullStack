@@ -2,6 +2,11 @@ package com.yonsai.rest_food_project.domain.review.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -71,6 +76,15 @@ public class ReviewController {
     @GetMapping("/{reviewId}")
     public ResponseEntity<ReviewResponseDTO> getReview(@PathVariable Long reviewId) {
         return ResponseEntity.ok(reviewService.getReview(reviewId));
+    }
+
+    // 커뮤니티 페이지용 리뷰 조회 0405 나다희 추가
+    @GetMapping("/community")
+    public ResponseEntity<Page<ReviewResponseDTO>> getCommunityReviews(
+        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ){
+
+        return ResponseEntity.ok(reviewService.getCommunityReviews(pageable));
     }
 
     // 리뷰 수정

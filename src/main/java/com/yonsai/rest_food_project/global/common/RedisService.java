@@ -68,5 +68,5 @@ public class RedisService {
             return true; // 좋아요 성공
         }
     }
-
 }
+

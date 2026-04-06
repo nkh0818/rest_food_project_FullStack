@@ -74,13 +74,17 @@ public class AuthController {
     public ResponseEntity<AuthResponseDTO> updateNickname(
             @RequestHeader("Authorization") String token,
             @RequestBody Map<String, String> body) {
-        String newNickname = body.get("nickname"); // 프론트에서 보낸 key값으로 꺼내기
+        log.info(">>>> 프론트엔드에서 보낸 데이터: {}", body);
 
+        String newNickname = body.get("nickname");
+        String profileImage = body.get("profileImage");
         if (newNickname == null || newNickname.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        AuthResponseDTO response = authService.updateNickname(token, body.get("nickname"));
+        // ✅ 서비스 호출 시 profileImage도 함께 전달!
+        AuthResponseDTO response = authService.updateNickname(token, newNickname, profileImage);
+
         return ResponseEntity.ok(response);
     }
 

@@ -35,17 +35,19 @@ public class RankingServiceImpl implements RankingService {
         // 1. 실시간 검색어 (Redis 상위 10개)
         List<String> hotKeywords = redisService.getDailyRanking();
 
-        // 2. 좋아요 많은 베스트 리뷰 (TOP 5)
-        List<ReviewResponseDTO> bestReviews = reviewRepository.findAllByOrderByLikeCountDesc(PageRequest.of(0, 5))
-                .stream()
-                .map(ReviewResponseDTO::from)
-                .collect(Collectors.toList());
+        // 2. 실시간 리뷰 (TOP 5)
+        List<ReviewResponseDTO> bestReviews = reviewRepository.findTop5ByOrderByIdDesc()
+            .stream()
+            .map(ReviewResponseDTO::from)
+            .collect(Collectors.toList());
 
         // 3. 리뷰 급상승 휴게소
         List<RestAreaResponseDto> trendingRestAreas = reviewRepository.findTrendingRestAreas(PageRequest.of(0, 10))
                 .stream()
                 .map(RestAreaResponseDto::fromEntity)
                 .collect(Collectors.toList());
+        
+        java.util.Collections.shuffle(trendingRestAreas);
 
         // 4. 이달의 탐험가 (XP 순 TOP 5)
         List<UserResponseDTO> topExplorers = userRepository.findAllByOrderByXpDesc(PageRequest.of(0, 5))

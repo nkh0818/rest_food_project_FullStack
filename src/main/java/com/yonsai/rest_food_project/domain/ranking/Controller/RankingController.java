@@ -1,4 +1,4 @@
-package com.yonsai.rest_food_project.domain.ranking.Controller;
+package com.yonsai.rest_food_project.domain.ranking.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

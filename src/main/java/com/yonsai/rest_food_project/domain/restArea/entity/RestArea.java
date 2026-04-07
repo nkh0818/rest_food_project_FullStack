@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.yonsai.rest_food_project.domain.review.entity.Review;
 
@@ -53,6 +54,11 @@ public class RestArea {
 
     private String oilCompany; // 정유사 (예: SK, GS, 알뜰주유소 등)
     private String telNo; // 주유소 전화번호
+
+    // --- Ai 리뷰 ---
+    private String aiSummary;
+    private Set<String> aiTags;
+    private String aiScore;
 
     // --- 관계 설정 ---
 

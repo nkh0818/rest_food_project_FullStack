@@ -41,6 +41,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
         List<Review> findByUserIdOrderByCreatedAtDesc(Long userId);
 
+        List<Review> findTop10ByRestAreaOrderByCreatedAtDesc(RestArea restArea);
+
+
+
         // count(집계)
         long countByUserId(Long userId);
 
@@ -49,6 +53,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         long countByUserIdAndImageUrlIsNotNull(Long userId);
 
         long countByUserIdAndRestAreaId(Long userId, Long restAreaId);
+
+        long countByRestArea(RestArea restArea);
 
         // 평균 평점
         @Query("SELECT COALESCE(AVG(r.rating), 0) FROM Review r WHERE r.restArea.id = :restAreaId")
@@ -107,8 +113,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         long countByRestAreaId(Long restAreaId);
 
         // -----0406 나다희-----
-        // 좋아요 순으로 정렬
-        List<Review> findAllByOrderByLikeCountDesc(Pageable pageable);
+
+        // 특정 휴게소의 최신순 상위 5개
+        List<Review> findTop5ByRestAreaIdOrderByIdDesc(Long restAreaId);
+
+        // 전체 휴게소의 최신순 상위 5개
+        List<Review> findTop5ByOrderByIdDesc();
 
         // 리뷰가 최근에 많이 달린 휴게소 Top5
         @Query("SELECT r FROM RestArea r " +
@@ -116,5 +126,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                         "GROUP BY rev.restArea " +
                         "ORDER BY COUNT(rev) DESC)")
         List<RestArea> findTrendingRestAreas(Pageable pageable);
+
+
 
 }

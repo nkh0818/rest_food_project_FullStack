@@ -1,6 +1,7 @@
 package com.yonsai.rest_food_project.domain.review.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonsai.rest_food_project.domain.ai.entity.ReviewResult;
+import com.yonsai.rest_food_project.domain.ai.service.ReviewSummarizer;
 import com.yonsai.rest_food_project.domain.restArea.entity.*;
 import com.yonsai.rest_food_project.domain.restArea.repository.*;
 import com.yonsai.rest_food_project.domain.review.dto.*;
@@ -21,10 +24,12 @@ import com.yonsai.rest_food_project.domain.user.service.UserTitleService;
 import com.yonsai.rest_food_project.global.exception.RoadQuestException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -33,6 +38,8 @@ public class ReviewServiceImpl implements ReviewService {
     private final RestAreaRepository restAreaRepository;
     private final FoodRepository foodRepository;
     private final ReviewLikeRepository reviewLikeRepository;
+
+    private final ReviewSummarizer reviewSummarizer;
 
     @Transactional
     @Override
@@ -63,8 +70,6 @@ public class ReviewServiceImpl implements ReviewService {
                 .imageUrl(dto.getImageUrl())
                 .build();
 
-        // 0403 나다희 추가
-
         Review savedReview = reviewRepository.save(review);
 
         user.addActivityScore(30);
@@ -80,6 +85,34 @@ public class ReviewServiceImpl implements ReviewService {
 
         userRepository.saveAndFlush(user);
         titleService.checkAndGrantTitles(user);
+
+        // Ai 로직 추가 0407 나다희
+
+        long reviewCount = reviewRepository.countByRestArea(restArea);
+            // reviewCount >= 5 && reviewCount % 5 == 0
+        if (reviewCount != 0) {
+            List<Review> recentReviews = reviewRepository.findTop10ByRestAreaOrderByCreatedAtDesc(restArea);
+
+            String combinedContent = recentReviews.stream()
+                    .map(Review::getContent)
+                    .collect(Collectors.joining("\n"));
+
+            try {
+
+                ReviewResult aiResult = reviewSummarizer.analyze(combinedContent);
+
+                restArea.setAiSummary(aiResult.summary());
+                restArea.setAiTags(aiResult.tags());
+                restArea.setAiScore(aiResult.score());
+
+                restAreaRepository.save(restArea);
+
+                log.info("성공 결과: {} - {}", aiResult.summary());
+
+            } catch (Exception e) {
+                log.error("Ai분석 오류 발생: {}", e.getMessage());
+            }
+        }
 
         userRepository.saveAndFlush(user);
 

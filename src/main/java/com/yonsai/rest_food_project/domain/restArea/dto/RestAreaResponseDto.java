@@ -26,6 +26,11 @@ public class RestAreaResponseDto {
     private Double lpgPrice = 0.0; // lpg
     private Double distance; // 거리
 
+    // AI 분석 데이터
+    private String aiSummary;
+    private String aiTags;
+    private String aiScore;
+
     public Double getPriceByFuelType(String fuelType) {
         if (fuelType == null)
             return 0.0;

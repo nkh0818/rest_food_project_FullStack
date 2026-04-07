@@ -28,6 +28,14 @@ spring:
           min-idle: 2
           max-wait: 3000ms
 
+  ai:
+    google:
+      genai:
+        api-key: ${GOOGLE_API_KEY}
+        chat:
+          options:
+            model: gemini-1.5-flash
+
   security:
     oauth2:
       client:

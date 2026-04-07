@@ -151,6 +151,8 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .level(user.getLevel())
                 .xp(user.getXp())
+                .currentTitle(user.getCurrentTitle() != null ? 
+                          user.getCurrentTitle().getTitleName() : "신규 탐험가")
                 .rewardPoint(user.getRewardPoint())
                 .reviewCount(user.getReviews().size())
                 .build();

@@ -7,12 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.yonsai.rest_food_project.domain.review.dto.*;
+import com.yonsai.rest_food_project.domain.review.service.BlockService;
 import com.yonsai.rest_food_project.domain.review.service.ReviewService;
 import com.yonsai.rest_food_project.global.auth.PrincipalDetails;
 
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final BlockService  blockService;
 
     // 새로운 리뷰 등록
     @PostMapping
@@ -80,11 +83,17 @@ public class ReviewController {
 
     // 커뮤니티 페이지용 리뷰 조회 0405 나다희 추가
     @GetMapping("/community")
-    public ResponseEntity<Page<ReviewResponseDTO>> getCommunityReviews(
-        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ){
+    public ResponseEntity<PagedModel<ReviewResponseDTO>> getCommunityReviews(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        // 1. 로그인 여부에 따라 userId 추출 (비로그인이면 null)
+        Long userId = (principalDetails != null) ? principalDetails.getUser().getId() : null;
 
-        return ResponseEntity.ok(reviewService.getCommunityReviews(pageable));
+        // 2. 서비스 호출 (PagedModel 반환)
+        PagedModel<ReviewResponseDTO> reviews = blockService.getCommunityReviews(userId, pageable);
+
+        return ResponseEntity.ok(reviews);
     }
 
     // 리뷰 수정

@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yonsai.rest_food_project.domain.ranking.dto.TotalRankingResponseDTO;
+import com.yonsai.rest_food_project.domain.ranking.service.RankingService;
 import com.yonsai.rest_food_project.global.common.RedisService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,12 +21,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequestMapping("/api/ranking")
 @RequiredArgsConstructor
 public class RankingController {
+
     private final RedisService redisService;
+    private final RankingService rankingService;
 
     @PostMapping("/record")
     public ResponseEntity<Void> recordSearchKeyword(@RequestParam String keyword) {
         redisService.incrementSearchCount(keyword);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/totalrank")
+    public ResponseEntity<TotalRankingResponseDTO> getRankings(){
+        return ResponseEntity.ok(rankingService.getTotalRankings());
     }
 
     // -----------조회------------

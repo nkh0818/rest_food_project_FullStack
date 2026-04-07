@@ -18,4 +18,5 @@ public class AuthResponseDTO {
     private int xp;
     private int rewardPoint;
     private long reviewCount;
+    private String currentTitle;
 }

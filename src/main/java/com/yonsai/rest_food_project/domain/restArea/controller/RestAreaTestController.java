@@ -87,10 +87,9 @@ public class RestAreaTestController {
      * 3. 랜덤 휴게소 리스트 (0404 나다희 추가)
      */
     @GetMapping("/random")
-    public ResponseEntity<Page<RestAreaResponseDto>> getRandomRestAreas(
-            @RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<List<RestAreaResponseDto>> getRandomRestAreas(
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(restAreaDataService.getRandomAreas(page, size));
+        return ResponseEntity.ok(restAreaDataService.getRandomAreas(size));
     }
 
     /**

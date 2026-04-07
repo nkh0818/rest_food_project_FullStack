@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtProvider jwtProvider;
+        private final JwtProvider jwtProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -43,8 +43,27 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // 누구나 볼 수 있는 조회 api
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ranking/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/trends/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/restareas/**").permitAll()
+                        .requestMatchers("/api/user/check-nickname/**").permitAll()
+                        .requestMatchers("/api/main/best-food/**").permitAll()
+                        
+
+                        // 인증/회원가입 관련
                         .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().permitAll())
+
+                        // 로그인이 필요한 요청
+                        .requestMatchers("/api/blocks/**").authenticated()
+                        .requestMatchers("/api/reviews/me").authenticated()
+                        .requestMatchers("/api/favorites/**").authenticated()
+
+                        // 나머지 요청 POST(등록), PUT(수정), DELETE(삭제)
+                        .anyRequest().authenticated())
 
                 .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
 

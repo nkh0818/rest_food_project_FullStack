@@ -17,6 +17,7 @@ import com.yonsai.rest_food_project.domain.review.repository.ReviewLikeRepositor
 import com.yonsai.rest_food_project.domain.review.repository.ReviewRepository;
 import com.yonsai.rest_food_project.domain.user.entity.User;
 import com.yonsai.rest_food_project.domain.user.repository.UserRepository;
+import com.yonsai.rest_food_project.domain.user.service.UserTitleService;
 import com.yonsai.rest_food_project.global.exception.RoadQuestException;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final UserTitleService titleService;
     private final RestAreaRepository restAreaRepository;
     private final FoodRepository foodRepository;
     private final ReviewLikeRepository reviewLikeRepository;
@@ -75,6 +77,11 @@ public class ReviewServiceImpl implements ReviewService {
         } else {
             user.setXp(newXp);
         }
+
+        userRepository.saveAndFlush(user);
+        titleService.checkAndGrantTitles(user);
+
+        userRepository.saveAndFlush(user);
 
         return ReviewResponseDTO.from(savedReview);
     }

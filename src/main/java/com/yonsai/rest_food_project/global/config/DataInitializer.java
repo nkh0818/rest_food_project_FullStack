@@ -46,12 +46,12 @@ public class DataInitializer implements CommandLineRunner {
     private void initTitles() {
         log.info(">> Title 초기화 시작");
 
-        saveTitleIfNotExists("초보 탐험가", "서비스 적응 단계", "SCORE", "SCORE", 50, null, null, 10);
+        saveTitleIfNotExists("초보 탐험가", "서비스 적응 단계", "SCORE", "SCORE", 10, null, null, 10);
         saveTitleIfNotExists("리뷰 탐험가", "리뷰 활동 시작", "SCORE", "SCORE", 120, null, null, 20);
-        saveTitleIfNotExists("휴게소 기록자", "꾸준한 기록 유저", "SCORE", "SCORE", 250, null, null, 30);
-        saveTitleIfNotExists("휴게소 전문가", "경험 많은 활동 유저", "SCORE", "SCORE", 450, null, null, 40);
-        saveTitleIfNotExists("로드마스터", "핵심 활동 유저", "SCORE", "SCORE", 700, null, null, 50);
-        saveTitleIfNotExists("전설의 여행자", "최상위 활동 유저", "SCORE", "SCORE", 1200, null, null, 60);
+        saveTitleIfNotExists("휴게소 기록자", "꾸준한 기록 유저", "SCORE", "SCORE", 240, null, null, 30);
+        saveTitleIfNotExists("휴게소 전문가", "경험 많은 활동 유저", "SCORE", "SCORE", 600, null, null, 40);
+        saveTitleIfNotExists("로드마스터", "핵심 활동 유저", "SCORE", "SCORE", 900, null, null, 50);
+        saveTitleIfNotExists("전설의 여행자", "최상위 활동 유저", "SCORE", "SCORE", 1500, null, null, 60);
 
         saveTitleIfNotExists("첫 방문자", "첫 리뷰 작성", "REVIEW", "REVIEW_COUNT", 1, null, null, 11);
         saveTitleIfNotExists("길 위의 기록자", "리뷰 10개 작성", "REVIEW", "REVIEW_COUNT", 10, null, null, 21);

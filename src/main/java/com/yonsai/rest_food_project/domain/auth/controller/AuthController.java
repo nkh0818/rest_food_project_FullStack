@@ -57,6 +57,7 @@ public class AuthController {
         return ResponseEntity.ok(nicknameGenerator.generate());
     }
 
+    // 회원 가입
     @PostMapping("/signup")
     public ResponseEntity<AuthResponseDTO> signUp(@Valid @RequestBody SignUpRequestDTO dto) {
         return ResponseEntity.ok(authService.signUp(dto));
@@ -70,6 +71,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    //닉네임 변경
     @PatchMapping("/nickname")
     public ResponseEntity<AuthResponseDTO> updateNickname(
             @RequestHeader("Authorization") String token,
@@ -82,7 +84,6 @@ public class AuthController {
             return ResponseEntity.badRequest().build();
         }
 
-        // ✅ 서비스 호출 시 profileImage도 함께 전달!
         AuthResponseDTO response = authService.updateNickname(token, newNickname, profileImage);
 
         return ResponseEntity.ok(response);

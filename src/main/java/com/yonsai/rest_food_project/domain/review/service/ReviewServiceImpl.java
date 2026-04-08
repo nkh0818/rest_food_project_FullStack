@@ -108,7 +108,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         // Ai 로직 추가 - 비동기 처리
         long reviewCount = reviewRepository.countByRestArea(restArea);
-        if (reviewCount != 0) {
+        if (reviewCount >= 5 && reviewCount % 5 == 0) {
             List<Review> recentReviews = reviewRepository.findTop10ByRestAreaOrderByCreatedAtDesc(restArea);
 
             String combinedContent = recentReviews.stream()

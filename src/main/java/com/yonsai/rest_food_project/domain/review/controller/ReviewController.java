@@ -114,7 +114,7 @@ public class ReviewController {
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
         reviewService.deleteReview(reviewId, principalDetails.getUser());
         return ResponseEntity.ok().build();
-    } // ADMIN 권한 추가 0403 나다희
+    }
 
     // 평균 평점 조회
     @GetMapping("/rest-area/{restAreaId}/average")
@@ -128,23 +128,23 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewCount(restAreaId));
     }
 
-    // 좋아요 추가
-    @PostMapping("/{reviewId}/like")
-    public ResponseEntity<Void> likeReview(
-            @PathVariable Long reviewId,
-            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    // // 좋아요 추가
+    // @PostMapping("/{reviewId}/like")
+    // public ResponseEntity<Void> likeReview(
+    //         @PathVariable Long reviewId,
+    //         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        reviewService.likeReview(reviewId, principalDetails.getUser().getId());
-        return ResponseEntity.ok().build();
-    }
+    //     reviewService.likeReview(reviewId, principalDetails.getUser().getId());
+    //     return ResponseEntity.ok().build();
+    // }
 
-    // 좋아요 취소
-    @DeleteMapping("/{reviewId}/like")
-    public ResponseEntity<Void> unlikeReview(
-            @PathVariable Long reviewId,
-            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    // // 좋아요 취소
+    // @DeleteMapping("/{reviewId}/like")
+    // public ResponseEntity<Void> unlikeReview(
+    //         @PathVariable Long reviewId,
+    //         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        reviewService.unlikeReview(reviewId, principalDetails.getUser().getId());
-        return ResponseEntity.ok().build();
-    }
+    //     reviewService.unlikeReview(reviewId, principalDetails.getUser().getId());
+    //     return ResponseEntity.ok().build();
+    // }
 }

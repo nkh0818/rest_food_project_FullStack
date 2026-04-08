@@ -46,7 +46,6 @@ public class FavoriteController {
         if (principal == null) {
             return ResponseEntity.ok(Collections.emptyList());
         }
-
         List<RestAreaResponseDto> favorites = favoriteService.findAllByUserEmailWithRestArea(principal.getName());
         return ResponseEntity.ok(favorites);
     }

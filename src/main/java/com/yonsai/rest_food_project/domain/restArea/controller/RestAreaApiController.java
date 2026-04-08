@@ -22,13 +22,13 @@ public class RestAreaApiController {
      */
     @GetMapping("/search")
     public List<RestAreaResponseDto> search(@RequestParam String keyword) {
-        System.out.println("📢 검색 요청 들어옴: " + keyword);
+        System.out.println("검색 요청 들어옴: " + keyword);
         redisService.incrementSearchCount(keyword);
         return restAreaDataService.search(keyword);
     }
 
     /**
-     * 2. 현재 검색 결과 내에서 필터링 (REST_AREA 또는 GAS_STATION)
+     * 2. 현재 검색 결과 내에서 필터링
      */
     @GetMapping("/filter")
     public List<RestAreaResponseDto> filter(@RequestParam String type) {

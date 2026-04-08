@@ -57,13 +57,18 @@ public class Review {
 
     @Column(name = "report_count")
     @Builder.Default
-    private int reportCount = 0; // 1차는 숫자만 두고 나중에 신고 테이블 확장 가능
+    private int reportCount = 0;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    // 인증 0408나다희 추가
+    @Column(name = "gps_verified")
+    @Builder.Default
+    private Boolean gpsVerified = false;
 
     // 자동으로 시간 설정
     @PrePersist
@@ -98,5 +103,7 @@ public class Review {
             this.rating = rating;
         if (tag != null)
             this.tag = tag;
+        if (gpsVerified != null)
+            this.gpsVerified = gpsVerified;
     }
 }

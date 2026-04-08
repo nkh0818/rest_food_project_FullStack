@@ -40,4 +40,22 @@ public interface RestAreaRepository extends JpaRepository<RestArea, Long> {
 
        List<RestArea> findTop5ByGasolinePriceGreaterThanOrderByGasolinePriceAsc(Double minPrice);
 
+       // --- Ai 가이드 ---
+
+       // 1. AI 분석 점수(aiScore)가 높은 순으로 상위 N개 가져오기
+       List<RestArea> findTop20ByOrderByAiScoreDesc();
+
+       // 2. 특정 태그(경치, 맛집, 테마 등)가 포함된 휴게소 검색
+       List<RestArea> findByAiTagsContaining(String tag);
+
+       // 3. 평점이 일정 수준 이상이면서 휘발유 가격 정보가 있는 곳 (안전한 추천용)
+       List<RestArea> findByRatingGreaterThanEqualAndGasolinePriceGreaterThan(Double rating, Double minPrice);
+
+       // 4. 루트 이름으로 찾되, AI 점수가 높은 순으로 정렬 (경로 기반 추천 시 유용)
+       List<RestArea> findByRouteNameContainingOrderByAiScoreDesc(String routeName);
+
+       // 5. (Native Query) AI 점수 + 별점을 조합해서 랜덤하게 상위 후보군 뽑기
+       @Query(value = "SELECT * FROM rest_area WHERE ai_score >= 4.0 OR rating >= 4.0 ORDER BY RAND() LIMIT 10", nativeQuery = true)
+       List<RestArea> findBestCandidateAreas();
+
 }

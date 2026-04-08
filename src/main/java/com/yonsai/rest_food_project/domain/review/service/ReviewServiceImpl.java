@@ -9,8 +9,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yonsai.rest_food_project.domain.ai.entity.ReviewResult;
-import com.yonsai.rest_food_project.domain.ai.service.ReviewSummarizer;
 import com.yonsai.rest_food_project.domain.restArea.entity.*;
 import com.yonsai.rest_food_project.domain.restArea.repository.*;
 import com.yonsai.rest_food_project.domain.review.dto.*;
@@ -21,6 +19,7 @@ import com.yonsai.rest_food_project.domain.review.repository.ReviewRepository;
 import com.yonsai.rest_food_project.domain.user.entity.User;
 import com.yonsai.rest_food_project.domain.user.repository.UserRepository;
 import com.yonsai.rest_food_project.domain.user.service.UserTitleService;
+import com.yonsai.rest_food_project.global.common.LocationUtils;
 import com.yonsai.rest_food_project.global.exception.RoadQuestException;
 
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,9 @@ public class ReviewServiceImpl implements ReviewService {
     private final FoodRepository foodRepository;
     private final ReviewLikeRepository reviewLikeRepository;
 
-    private final ReviewSummarizer reviewSummarizer;
+    private final AsyncAiReviewService asyncAiReviewService;
+
+    private final LocationUtils locationUtils;
 
     @Transactional
     @Override
@@ -60,6 +61,24 @@ public class ReviewServiceImpl implements ReviewService {
                 ? null
                 : String.join(",", dto.getTags());
 
+        boolean isVerified = false;
+
+        if (restArea.getLatitude() != null && restArea.getLongitude() != null &&
+                restArea.getLatitude() != 0.0 && restArea.getLongitude() != 0.0 &&
+                dto.getUserLat() != null && dto.getUserLon() != null) {
+
+            double distance = locationUtils.getDistance(
+                    dto.getUserLat(), dto.getUserLon(),
+                    restArea.getLatitude(), restArea.getLongitude());
+
+            // 1000m(1km) 이내면 인증 성공
+            isVerified = distance <= 1000;
+            log.info("GPS 인증 결과: {} (거리: {}m)", isVerified, (int) distance);
+        } else {
+            log.warn("좌표 데이터 부족으로 GPS 인증을 스킵합니다. (휴게소 코드: {})", restArea.getStdRestCd());
+            // 좌표가 없으면 기본값 false 유지
+        }
+
         Review review = Review.builder()
                 .user(user)
                 .restArea(restArea)
@@ -68,6 +87,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .content(dto.getContent())
                 .tag(tagString)
                 .imageUrl(dto.getImageUrl())
+                .gpsVerified(isVerified)
                 .build();
 
         Review savedReview = reviewRepository.save(review);
@@ -86,10 +106,8 @@ public class ReviewServiceImpl implements ReviewService {
         userRepository.saveAndFlush(user);
         titleService.checkAndGrantTitles(user);
 
-        // Ai 로직 추가 0407 나다희
-
+        // Ai 로직 추가 - 비동기 처리
         long reviewCount = reviewRepository.countByRestArea(restArea);
-            // reviewCount >= 5 && reviewCount % 5 == 0
         if (reviewCount != 0) {
             List<Review> recentReviews = reviewRepository.findTop10ByRestAreaOrderByCreatedAtDesc(restArea);
 
@@ -97,21 +115,7 @@ public class ReviewServiceImpl implements ReviewService {
                     .map(Review::getContent)
                     .collect(Collectors.joining("\n"));
 
-            try {
-
-                ReviewResult aiResult = reviewSummarizer.analyze(combinedContent);
-
-                restArea.setAiSummary(aiResult.summary());
-                restArea.setAiTags(aiResult.tags());
-                restArea.setAiScore(aiResult.score());
-
-                restAreaRepository.save(restArea);
-
-                log.info("성공 결과: {} - {}", aiResult.summary());
-
-            } catch (Exception e) {
-                log.error("Ai분석 오류 발생: {}", e.getMessage());
-            }
+            asyncAiReviewService.analyzeAndUpdate(restArea.getStdRestCd(), combinedContent);
         }
 
         userRepository.saveAndFlush(user);
@@ -123,8 +127,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     @Override
     public Page<ReviewResponseDTO> getCommunityReviews(Pageable pageable) {
-       Page<Review> reviews = reviewRepository.findAll(pageable);
-       return reviews.map(ReviewResponseDTO::from);
+        Page<Review> reviews = reviewRepository.findAll(pageable);
+        return reviews.map(ReviewResponseDTO::from);
     }
 
     @Override

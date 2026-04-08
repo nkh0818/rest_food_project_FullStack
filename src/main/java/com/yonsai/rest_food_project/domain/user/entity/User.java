@@ -86,11 +86,15 @@ public class User {
         return this.role == UserRole.ADMIN;
     }
 
+    // 유저 프로필 이미지
+    @Column(name = "profile_image")
+    private String profileImage;
+
     // 사용자가 누른 추천 목록 조회
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLikes = new ArrayList<>();
-    
+
     // 사용자가 획득한 칭호 목록
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

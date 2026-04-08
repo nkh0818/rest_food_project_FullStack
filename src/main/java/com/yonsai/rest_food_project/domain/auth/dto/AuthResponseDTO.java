@@ -19,4 +19,5 @@ public class AuthResponseDTO {
     private int rewardPoint;
     private long reviewCount;
     private String currentTitle;
+    private String profileImage;
 }

@@ -21,7 +21,10 @@ public interface UserService {
     UserResponseDTO getMyInfo(Long userId);
 
     // 닉네임 변경
-    User nicknameUpdate(Long userId, String newNickname);
+    // User nicknameUpdate(Long userId, String newNickname);
+
+    // 프사 변경
+    User nicknameUpdate(Long userId, String newNickname, String profileImage);
 
     // // 회원 탈퇴
     // void deleteUser(Long userId);

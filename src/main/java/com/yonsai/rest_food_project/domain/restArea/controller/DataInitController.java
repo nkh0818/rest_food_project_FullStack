@@ -31,7 +31,7 @@ public class DataInitController {
     @GetMapping("/init-oil")
     public String initOil() {
         // 기존 updateOilPricesOnly() 대신 통합된 메서드 호출
-        restAreaDataService.updateOilPricesAndMerge(); 
+        restAreaDataService.updateOilPricesAndMerge();
         return "실시간 유가 업데이트 및 휴게소 데이터 머지 완료!";
     }
 
@@ -44,37 +44,34 @@ public class DataInitController {
         return "이벤트 데이터 수집 완료!";
     }
 
-
-    
-
     // 1. 기존: 휴게소 목록만 (A단계)
     // @GetMapping("/init-data-reg")
     // public String initBasic() {
-    //     restAreaDataService.fetchAndSaveAllData(); // 휴게소 리스트만 저장 혹시몰라서 주석
-    //     return "기초 정보 수집 완료";
+    // restAreaDataService.fetchAndSaveAllData(); // 휴게소 리스트만 저장 혹시몰라서 주석
+    // return "기초 정보 수집 완료";
     // }
 
     // // 휴게소 + 음식
     // @GetMapping("/init-foods")
     // public String initFoods() {
-    //     restAreaDataService.fetchAndSaveAllData();
-    //     return "음식 데이터 수집 시작 (로그를 확인하세요)";
+    // restAreaDataService.fetchAndSaveAllData();
+    // return "음식 데이터 수집 시작 (로그를 확인하세요)";
     // }
 
     // // 유가 정보만 수집
     // @GetMapping("/init-oil")
     // public String initOil() {
-    //     restAreaDataService.updateOilPricesOnly();
-    //     return "실시간 유가 정보 업데이트 완료!";
+    // restAreaDataService.updateOilPricesOnly();
+    // return "실시간 유가 정보 업데이트 완료!";
     // }
 
     // @GetMapping("/init-events")
     // public String initEvents() {
-    //     eventService.fetchAndSaveAllEvents();
-    //     return "이벤트 데이터 수집 완료!";
+    // eventService.fetchAndSaveAllEvents();
+    // return "이벤트 데이터 수집 완료!";
     // }
-    // http://localhost:8080/init-oil
     // http://localhost:8080/init-foods
     // http://localhost:8080/init-data-reg
+    // http://localhost:8080/init-oil
     // http://localhost:8080/init-events 휴게소 이벤트들
 }

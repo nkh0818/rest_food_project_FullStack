@@ -80,26 +80,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User nicknameUpdate(Long userId, String newNickname) {
-
+    public User nicknameUpdate(Long userId, String newNickname, String profileImage) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RoadQuestException("사용자를 찾을 수 없습니다. ID: " + userId));
 
         String oldNickname = user.getNickname();
 
-        // 1. 중복 확인
-        if (userRepo.existsByNickname(newNickname) || redisService.isNicknameExists(newNickname)) {
-            throw new RoadQuestException("이미 사용중인 닉네임입니다!");
+        // 1. 닉네임 변경 로직
+        if (!oldNickname.equals(newNickname)) {
+            if (userRepo.existsByNickname(newNickname) || redisService.isNicknameExists(newNickname)) {
+                throw new RoadQuestException("이미 사용중인 닉네임입니다!");
+            }
+            user.setNickname(newNickname);
+            redisService.deleteNickname(oldNickname);
+            redisService.saveNickname(newNickname);
         }
 
-        user.setNickname(newNickname);
-
-        redisService.deleteNickname(oldNickname);
-        redisService.saveNickname(newNickname);
-
-        log.info("닉네임 변경 완료: {} -> {}", oldNickname, newNickname);
-
-        // 4. 수정된 객체 반환 (AuthServiceImpl에서 사용하기 위함)
+        // 2. 프로필 이미지 변경 로직 (추가)
+        if (profileImage != null && !profileImage.isEmpty()) {
+            user.setProfileImage(profileImage);
+        }
+        user.setProfileImage(profileImage);
+        log.info("DB 저장 직전 유저 객체 상태: {}", user.getProfileImage()); // 여기서 null이 나오면 1번(Setter) 문제!
         return user;
     }
 

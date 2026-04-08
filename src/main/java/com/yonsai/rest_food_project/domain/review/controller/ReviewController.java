@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final BlockService  blockService;
+    private final BlockService blockService;
 
     // 새로운 리뷰 등록
     @PostMapping
@@ -37,7 +37,7 @@ public class ReviewController {
             @Valid @RequestBody ReviewRequestDTO dto) {
 
         // principalDetails가 null이면 로그인이 안 된 상태
-        Long userId = principalDetails.getUser().getId(); 
+        Long userId = principalDetails.getUser().getId();
         return ResponseEntity.ok(reviewService.createReview(userId, dto));
     }
 
@@ -64,13 +64,13 @@ public class ReviewController {
     @GetMapping("/me")
     public ResponseEntity<List<ReviewResponseDTO>> getMyReviews(
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        
+
         // 토큰에서 현재 로그인한 유저 ID 추출
         Long userId = principalDetails.getUser().getId();
-        
+
         // 서비스에서 내가 쓴 리뷰 목록 가져오기
         List<ReviewResponseDTO> myReviews = reviewService.getMyReviews(userId);
-        
+
         return ResponseEntity.ok(myReviews);
     }
 
@@ -85,8 +85,7 @@ public class ReviewController {
     @GetMapping("/community")
     public ResponseEntity<PagedModel<ReviewResponseDTO>> getCommunityReviews(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         // 1. 로그인 여부에 따라 userId 추출 (비로그인이면 null)
         Long userId = (principalDetails != null) ? principalDetails.getUser().getId() : null;
 
@@ -104,7 +103,7 @@ public class ReviewController {
             @RequestBody ReviewUpdateRequestDTO dto) {
 
         Long userId = principalDetails.getUser().getId();
-        reviewService.updateReview(reviewId, userId, dto); 
+        reviewService.updateReview(reviewId, userId, dto);
         return ResponseEntity.ok().build();
     }
 
@@ -114,8 +113,8 @@ public class ReviewController {
             @PathVariable Long reviewId,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
         reviewService.deleteReview(reviewId, principalDetails.getUser());
-    return ResponseEntity.ok().build();
-    } //ADMIN 권한 추가 0403 나다희
+        return ResponseEntity.ok().build();
+    } // ADMIN 권한 추가 0403 나다희
 
     // 평균 평점 조회
     @GetMapping("/rest-area/{restAreaId}/average")
@@ -128,7 +127,7 @@ public class ReviewController {
     public ResponseEntity<Long> getCount(@PathVariable Long restAreaId) {
         return ResponseEntity.ok(reviewService.getReviewCount(restAreaId));
     }
-    
+
     // 좋아요 추가
     @PostMapping("/{reviewId}/like")
     public ResponseEntity<Void> likeReview(

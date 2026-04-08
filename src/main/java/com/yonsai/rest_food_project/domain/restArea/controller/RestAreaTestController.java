@@ -83,24 +83,20 @@ public class RestAreaTestController {
         return ResponseEntity.ok(result);
     }
 
-    /**
-     * 3. 랜덤 휴게소 리스트 (0404 나다희 추가)
-     */
+    /** 랜덤 휴게소 리스트*/
     @GetMapping("/random")
     public ResponseEntity<List<RestAreaResponseDto>> getRandomRestAreas(
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(restAreaDataService.getRandomAreas(size));
     }
 
-    /**
-     * 4. 이름 검색 (일반 검색창용)
-     */
+    /** 이름 검색 (일반 검색창용)*/
     @GetMapping("/search-name")
     public ResponseEntity<Page<RestAreaResponseDto>> searchByRestAreaName(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        log.info("🔍 휴게소 이름 검색 시작: keyword={}, page={}", keyword, page);
+        log.info("휴게소 이름 검색 시작: keyword={}, page={}", keyword, page);
         return ResponseEntity.ok(restAreaDataService.searchAreas(keyword, page, size));
     }
 }

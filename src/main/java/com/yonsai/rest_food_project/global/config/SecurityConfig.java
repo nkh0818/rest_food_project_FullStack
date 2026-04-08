@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -52,7 +52,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/restareas/**").permitAll()
                         .requestMatchers("/api/user/check-nickname/**").permitAll()
                         .requestMatchers("/api/main/best-food/**").permitAll()
-                        
 
                         // 인증/회원가입 관련
                         .requestMatchers("/api/auth/**").permitAll()
@@ -61,7 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/blocks/**").authenticated()
                         .requestMatchers("/api/reviews/me").authenticated()
                         .requestMatchers("/api/favorites/**").authenticated()
-
+                        .requestMatchers("/init-**").permitAll()
                         // 나머지 요청 POST(등록), PUT(수정), DELETE(삭제)
                         .anyRequest().authenticated())
 

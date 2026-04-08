@@ -136,11 +136,11 @@ public class RestAreaDataService {
     // ================= [페이징 지원 검색/랜덤] =================
 
     public List<RestAreaResponseDto> getRandomAreas(int size) {
-    Pageable pageable = PageRequest.of(0, size);
-    return restAreaRepository.findRandomAreas(pageable).stream()
-            .map(entity -> RestAreaResponseDto.fromEntity(entity, 0.0))
-            .collect(Collectors.toList());
-}
+        Pageable pageable = PageRequest.of(0, size);
+        return restAreaRepository.findRandomAreas(pageable).stream()
+                .map(entity -> RestAreaResponseDto.fromEntity(entity, 0.0))
+                .collect(Collectors.toList());
+    }
 
     public Page<RestAreaResponseDto> searchAreas(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);

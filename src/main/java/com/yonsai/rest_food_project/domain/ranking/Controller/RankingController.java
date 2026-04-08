@@ -1,4 +1,4 @@
-package com.yonsai.rest_food_project.domain.ranking.controller;
+package com.yonsai.rest_food_project.domain.ranking.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +32,7 @@ public class RankingController {
     }
 
     @GetMapping("/totalrank")
-    public ResponseEntity<TotalRankingResponseDTO> getRankings(){
+    public ResponseEntity<TotalRankingResponseDTO> getRankings() {
         return ResponseEntity.ok(rankingService.getTotalRankings());
     }
 

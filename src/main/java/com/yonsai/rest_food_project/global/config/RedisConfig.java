@@ -1,6 +1,6 @@
 package com.yonsai.rest_food_project.global.config;
 
-import org.springframework.beans.factory.annotation.Value; // 추가
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

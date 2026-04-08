@@ -30,14 +30,14 @@ public class RestAreaEventController {
         return "event/list"; // templates/event/list.html
     }
 
-    // 전체 목록 조회 (http://localhost:8080/events)
+    // 전체 목록 조회
     @GetMapping
     public String allEvents(Model model) {
         model.addAttribute("events", eventService.getAllEvents());
         return "event/list";
     }
 
-    // 상세 내용 조회 (http://localhost:8080/events/1)
+    // 상세 내용 조회
     @GetMapping("/{id}")
     public String eventDetail(@PathVariable Long id, Model model) {
         model.addAttribute("event", eventService.getEventDetail(id));

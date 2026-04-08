@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/reviews/me").authenticated()
                         .requestMatchers("/api/favorites/**").authenticated()
                         .requestMatchers("/init-**").permitAll()
+
                         // 나머지 요청 POST(등록), PUT(수정), DELETE(삭제)
                         .anyRequest().authenticated())
 

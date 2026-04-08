@@ -52,6 +52,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/restareas/**").permitAll()
                         .requestMatchers("/api/user/check-nickname/**").permitAll()
                         .requestMatchers("/api/main/best-food/**").permitAll()
+                        .requestMatchers("/init-**").permitAll()
+                        .requestMatchers("/api/recommend/**").permitAll()
+                        
 
                         // 인증/회원가입 관련
                         .requestMatchers("/api/auth/**").permitAll()

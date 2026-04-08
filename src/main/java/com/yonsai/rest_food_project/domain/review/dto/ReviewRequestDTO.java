@@ -29,10 +29,9 @@ public class ReviewRequestDTO {
     private String tag;
     private List<String> tags; // 기존 유지하고 추가
 
-    // 거리 계산을 위해 리액트에서 넘겨받아야 하는 사용자의 현재 위치
-    @NotNull(message = "사용자의 현재 위도 정보가 필요합니다.")
+    // 거리 계산을 위한 사용자의 현재 위치
     private Double userLat;
-
-    @NotNull(message = "사용자의 현재 경도 정보가 필요합니다.")
     private Double userLon;
+
+    private Boolean gpsVerified;
 }

@@ -57,8 +57,14 @@ public class RestArea {
 
     // --- Ai 리뷰 ---
     private String aiSummary;
+
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> aiTags;
     private String aiScore;
+
+    private Double rating; 
+
+    private Integer reviewCount;
 
     // --- 관계 설정 ---
 

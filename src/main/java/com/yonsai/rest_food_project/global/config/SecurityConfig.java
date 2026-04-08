@@ -76,7 +76,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://43.200.160.144"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://43.200.160.144",
+                "http://43.200.160.144:80"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 쿠키나 인증 헤더 허용 시 true

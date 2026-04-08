@@ -51,7 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/trends/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/restareas/**").permitAll()
                         .requestMatchers("/api/user/check-nickname/**").permitAll()
-                        .requestMatchers("/api/main/best-food/**").permitAll()
+                        .requestMatchers("/api/main/best-food/**", "/api/main/best-food").permitAll()
 
                         // 인증/회원가입 관련
                         .requestMatchers("/api/auth/**").permitAll()
@@ -73,7 +73,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://43.200.160.144"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://43.200.160.144",
+                "http://43.200.160.144:80"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 쿠키나 인증 헤더 허용 시 true

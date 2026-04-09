@@ -55,7 +55,7 @@ public class RankingServiceImpl implements RankingService {
                 .map(UserResponseDTO::from)
                 .collect(Collectors.toList());
 
-        // 5. 전국 최저가 주유소 (가격 낮은 순 TOP 5)
+        // 5. 전국 최저가 주유소 (가격 낮은 순 TOP 10)
         List<RestAreaResponseDto> lowestGasPrices = restAreaRepository
                 .findTop5ByGasolinePriceGreaterThanOrderByGasolinePriceAsc(0.0)
                 .stream()

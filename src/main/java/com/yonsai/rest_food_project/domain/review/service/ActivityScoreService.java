@@ -13,7 +13,7 @@ public interface ActivityScoreService {
 
     void subtractScoreForConfirmedReport(User user);
 
-    Double getAverageRating(Long restAreaId);
+    Double getAverageRating(String restAreaId);
 
-    Long getReviewCount(Long restAreaId);
+    Long getReviewCount(String restAreaId);
 }

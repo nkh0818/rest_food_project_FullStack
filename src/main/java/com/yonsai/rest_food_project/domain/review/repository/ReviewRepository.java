@@ -30,12 +30,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             """)
     Page<Review> findAllExcludingBlocked(@Param("blockerId") Long blockerId, Pageable pageable);
 
+    List<Review> findByRestAreaStdRestCd(String restAreaId);
+
     List<Review> findByFoodId(Long foodId);
 
     List<Review> findByUserId(Long userId);
 
     // 정렬 포함 조회
-    List<Review> findByRestAreaIdOrderByCreatedAtDesc(Long restAreaId);
+    List<Review> findByRestAreaStdRestCdOrderByCreatedAtDesc(String restAreaId);
 
     List<Review> findByFoodIdOrderByCreatedAtDesc(Long foodId);
 
@@ -50,13 +52,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     long countByUserIdAndImageUrlIsNotNull(Long userId);
 
-    long countByUserIdAndRestAreaId(Long userId, Long restAreaId);
+    long countByUserIdAndRestAreaStdRestCd(Long userId, String stdRestCd);
 
     long countByRestArea(RestArea restArea);
 
     // 평균 평점
     @Query("SELECT COALESCE(AVG(r.rating), 0) FROM Review r WHERE r.restArea.id = :restAreaId")
-    Double getAverageRating(@Param("restAreaId") Long restAreaId);
+    Double getAverageRating(@Param("restAreaId") String restAreaId);
 
     // 좋아요 합
     @Query("SELECT COALESCE(SUM(r.likeCount), 0) FROM Review r WHERE r.user.id = :userId")
@@ -105,15 +107,15 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                 from Review r
                 where r.restArea.id = :restAreaId
             """)
-    Double findAverageRatingByRestAreaId(Long restAreaId);
+    Double findAverageRatingByRestAreaId(String restAreaId);
 
     // 휴게소 리뷰 개수
-    long countByRestAreaId(Long restAreaId);
+    Long countByRestAreaStdRestCd(String stdRestCd);
 
     // -----0406 나다희-----
 
     // 특정 휴게소의 최신순 상위 5개
-    List<Review> findTop5ByRestAreaIdOrderByIdDesc(Long restAreaId);
+    List<Review> findTop5ByRestAreaStdRestCdOrderByIdDesc(String restAreaId);
 
     // 전체 휴게소의 최신순 상위 5개
     List<Review> findTop5ByOrderByIdDesc();

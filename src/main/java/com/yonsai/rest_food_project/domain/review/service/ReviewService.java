@@ -14,7 +14,7 @@ public interface ReviewService {
 
     ReviewResponseDTO createReview(Long userId, ReviewRequestDTO dto);
 
-    List<ReviewResponseDTO> getReviewsByRestArea(Long restAreaId, Long userId);
+    List<ReviewResponseDTO> getReviewsByRestArea(String restAreaId, Long userId);
 
     List<ReviewResponseDTO> getReviewsByFood(Long foodId);
 
@@ -28,9 +28,9 @@ public interface ReviewService {
 
     void deleteReview(Long reviewId, User currentUser);
 
-    Double getAverageRating(Long restAreaId);
+    Double getAverageRating(String restAreaId);
 
-    Long getReviewCount(Long restAreaId);
+    Long getReviewCount(String restAreaId);
 
     void likeReview(Long reviewId, Long userId);
 

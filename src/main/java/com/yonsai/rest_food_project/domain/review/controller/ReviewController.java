@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Validated
 public class ReviewController {
-
     private final ReviewService reviewService;
     private final BlockService blockService;
 
@@ -44,7 +43,7 @@ public class ReviewController {
     // 휴게소 별 리뷰 조회
     @GetMapping("/rest-area/{restAreaId}")
     public ResponseEntity<List<ReviewResponseDTO>> getReviewsByRestArea(
-            @PathVariable Long restAreaId,
+            @PathVariable String restAreaId,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         // 로그인 안 했으면 좋아요 여부 체크를 위해 null 전달, 했으면 ID 전달
@@ -118,33 +117,53 @@ public class ReviewController {
 
     // 평균 평점 조회
     @GetMapping("/rest-area/{restAreaId}/average")
-    public ResponseEntity<Double> getAverage(@PathVariable Long restAreaId) {
+    public ResponseEntity<Double> getAverage(@PathVariable String restAreaId) {
         return ResponseEntity.ok(reviewService.getAverageRating(restAreaId));
     }
 
     // 리뷰 개수 조회
     @GetMapping("/rest-area/{restAreaId}/count")
-    public ResponseEntity<Long> getCount(@PathVariable Long restAreaId) {
+    public ResponseEntity<Long> getCount(@PathVariable String restAreaId) {
         return ResponseEntity.ok(reviewService.getReviewCount(restAreaId));
     }
 
     // // 좋아요 추가
     // @PostMapping("/{reviewId}/like")
     // public ResponseEntity<Void> likeReview(
-    //         @PathVariable Long reviewId,
-    //         @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    // @PathVariable Long reviewId,
+    // @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-    //     reviewService.likeReview(reviewId, principalDetails.getUser().getId());
-    //     return ResponseEntity.ok().build();
+    // reviewService.likeReview(reviewId, principalDetails.getUser().getId());
+    // return ResponseEntity.ok().build();
     // }
 
     // // 좋아요 취소
     // @DeleteMapping("/{reviewId}/like")
     // public ResponseEntity<Void> unlikeReview(
-    //         @PathVariable Long reviewId,
-    //         @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    // @PathVariable Long reviewId,
+    // @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-    //     reviewService.unlikeReview(reviewId, principalDetails.getUser().getId());
-    //     return ResponseEntity.ok().build();
+    // reviewService.unlikeReview(reviewId, principalDetails.getUser().getId());
+    // return ResponseEntity.ok().build();
+    // }
+
+    // // 좋아요 추가
+    // @PostMapping("/{reviewId}/like")
+    // public ResponseEntity<Void> likeReview(
+    // @PathVariable Long reviewId,
+    // @AuthenticationPrincipal PrincipalDetails principalDetails) {
+
+    // reviewService.likeReview(reviewId, principalDetails.getUser().getId());
+    // return ResponseEntity.ok().build();
+    // }
+
+    // // 좋아요 취소
+    // @DeleteMapping("/{reviewId}/like")
+    // public ResponseEntity<Void> unlikeReview(
+    // @PathVariable Long reviewId,
+    // @AuthenticationPrincipal PrincipalDetails principalDetails) {
+
+    // reviewService.unlikeReview(reviewId, principalDetails.getUser().getId());
+    // return ResponseEntity.ok().build();
     // }
 }

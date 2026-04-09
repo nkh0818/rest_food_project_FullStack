@@ -22,9 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AsyncAiReviewService {
 
     private static final Set<String> TAG_BLACKLIST = Set.of(
-        "재방문", "만족", "불만족", "추천", "비추", "별로",
-        "좋음", "나쁨", "기대이하", "좋아요", "싫어요", "실망"
-    );
+            "재방문", "만족", "불만족", "추천", "비추", "별로",
+            "좋음", "나쁨", "기대이하", "좋아요", "싫어요", "실망");
 
     private final ReviewSummarizer reviewSummarizer;
     private final RestAreaRepository restAreaRepository;
@@ -42,8 +41,11 @@ public class AsyncAiReviewService {
                     .filter(tag -> !TAG_BLACKLIST.contains(tag))
                     .collect(Collectors.toSet());
 
+            String tagsString = filteredTags.stream()
+                    .collect(Collectors.joining(", ", "[", "]"));
+
             restArea.setAiSummary(aiResult.summary());
-            restArea.setAiTags(filteredTags);
+            restArea.setAiTags(tagsString);
             restArea.setAiScore(aiResult.score());
 
             restAreaRepository.save(restArea);

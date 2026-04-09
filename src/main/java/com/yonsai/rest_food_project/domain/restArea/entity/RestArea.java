@@ -58,11 +58,11 @@ public class RestArea {
     // --- Ai 리뷰 ---
     private String aiSummary;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> aiTags;
+    @Column(name = "ai_tags", length = 500)
+    private String aiTags;
     private String aiScore;
 
-    private Double rating; 
+    private Double rating;
 
     private Integer reviewCount;
 

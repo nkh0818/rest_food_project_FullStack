@@ -132,8 +132,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewResponseDTO> getReviewsByRestArea(Long restAreaId, Long userId) {
-        return reviewRepository.findByRestAreaId(restAreaId)
+    public List<ReviewResponseDTO> getReviewsByRestArea(String restAreaId, Long userId) {
+        return reviewRepository.findByRestAreaStdRestCd(restAreaId)
                 .stream()
                 .map(review -> {
                     boolean liked = false;
@@ -197,13 +197,13 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Double getAverageRating(Long restAreaId) {
+    public Double getAverageRating(String restAreaId) {
         return reviewRepository.getAverageRating(restAreaId);
     }
 
     @Override
-    public Long getReviewCount(Long restAreaId) {
-        return reviewRepository.countByRestAreaId(restAreaId);
+    public Long getReviewCount(String restAreaId) {
+        return reviewRepository.countByRestAreaStdRestCd(restAreaId);
     }
 
     @Transactional

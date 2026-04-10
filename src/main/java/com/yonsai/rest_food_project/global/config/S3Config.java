@@ -8,6 +8,8 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+// [AWS S3 설정] 리뷰 이미지나 프로필 사진 등 대용량 파일을 클라우드 저장소(S3)에 보관
+
 @Configuration
 public class S3Config {
 

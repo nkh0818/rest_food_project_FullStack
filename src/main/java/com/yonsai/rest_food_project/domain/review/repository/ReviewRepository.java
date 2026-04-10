@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.yonsai.rest_food_project.domain.restArea.entity.RestArea;
 import com.yonsai.rest_food_project.domain.review.entity.Review;
+import com.yonsai.rest_food_project.domain.user.entity.User;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
@@ -35,6 +36,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByFoodId(Long foodId);
 
     List<Review> findByUserId(Long userId);
+
+    List<Review> findByUserOrderByCreatedAtDesc(User user);
 
     // 정렬 포함 조회
     List<Review> findByRestAreaStdRestCdOrderByCreatedAtDesc(String restAreaId);

@@ -22,6 +22,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+// [사용자 차단 서비스] 불량 이용자 차단/해제 및 차단된 사용자의 리뷰를 필터링하는 기능을 제공
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,6 +33,7 @@ public class BlockServiceImpl implements BlockService {
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
 
+    // [유저 차단] 특정 사용자를 차단 리스트에 추가합니다. (자기 자신 차단 불가 및 중복 차단 방지 로직 포함)
     @Override
     @Transactional
     public void blockUser(User me, Long blockedUserId) {
@@ -45,6 +48,7 @@ public class BlockServiceImpl implements BlockService {
         User target = userRepository.findById(blockedUserId)
                 .orElseThrow(() -> new IllegalArgumentException("차단 대상 사용자를 찾을 수 없습니다."));
 
+        // 이미 차단된 관계인지 확인하여 중복 저장 방지
         if (blockRepository.existsByBlockerAndBlocked(blocker, target)) {
             return;
         }
@@ -59,11 +63,13 @@ public class BlockServiceImpl implements BlockService {
         blockRepository.save(block);
     }
 
+    //[커뮤니티 리뷰 조회] 차단한 유저의 게시물을 제외하고 리뷰 목록을 페이징하여 가져옵니다.
+
     @Override
     public PagedModel<ReviewResponseDTO> getCommunityReviews(Long userId, Pageable pageable) {
         Page<Review> reviewPage;
 
-        // userId가 null이거나 0이면 차단 필터링 없이 전체 조회
+        // 비로그인 시 전체 조회, 로그인 시 차단 유저 제외 쿼리 실행
         if (userId != null && userId > 0) {
             reviewPage = reviewRepository.findAllExcludingBlocked(userId, pageable);
         } else {
@@ -73,6 +79,7 @@ public class BlockServiceImpl implements BlockService {
         return new PagedModel<>(reviewPage.map(ReviewResponseDTO::from));
     }
 
+    //[차단 해제] 차단 리스트에서 특정 유저를 삭제하여 다시 리뷰가 보이도록 합니다.
     @Transactional
     @Override
     public void unblockUser(User me, Long blockedUserId) {
@@ -84,16 +91,17 @@ public class BlockServiceImpl implements BlockService {
         log.info("차단 해제 실행: {} -> {}", blocker.getId(), blockedUserId);
     }
 
+    //[차단 목록 조회] 내가 현재 차단 중인 유저들의 리스트(닉네임, 차단 일시 등)를 확인
     @Override
     public List<BlockResponseDTO> getBlockedUserList(Long myId) {
-        
+
         List<Block> blocks = blockRepository.findAllByBlockerId(myId);
 
         return blocks.stream()
                 .map(block -> BlockResponseDTO.builder()
                         .userId(block.getBlocked().getId())
                         .nickname(block.getBlocked().getNickname())
-                        .createdAt(block.getCreatedAt().toString()) // 날짜 포맷은 취향대로!
+                        .createdAt(block.getCreatedAt().toString())
                         .build())
                 .collect(Collectors.toList());
     }

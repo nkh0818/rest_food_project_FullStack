@@ -19,6 +19,8 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+// JWT 토큰 생성, 복호화, 유효성 검증을 담당하는 컴포넌트
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class JwtProvider {
     private String secretKeyBasic;
     private SecretKey key;
 
-    private final long TOKEN_VALID_TIME = 24 * 60 * 60 * 1000L;
+    private final long TOKEN_VALID_TIME = 24 * 60 * 60 * 1000L; // 토큰 유효시간 (24시간)
     private final UserRepository userRepository;
 
     @PostConstruct
@@ -37,6 +39,7 @@ public class JwtProvider {
         log.info("JWT Provider 초기화 완료 - 암호화 키 생성됨");
     }
 
+    // [토큰 발급] 유저의 이메일과 닉네임을 담아 24시간 동안 유효한 서명된 JWT 토큰을 생성
     public String createToken(String email, String nickname) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + TOKEN_VALID_TIME);
@@ -60,6 +63,7 @@ public class JwtProvider {
                 .getSubject(); // 토큰 생성 시 이메일을 Subject에 넣었다고 가정
     }
 
+    // [위조 검사] 토큰의 서명이 우리 서버의 키와 맞는지, 유효기간이 지나지는 않았는지 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -82,7 +86,7 @@ public class JwtProvider {
 
         String email = claims.getSubject();
 
-        // DB에서 조회하고 principalDetails에 저장한다
+        // DB에서 최신 유저 정보를 가져와 Security 전용 Principal 객체에 담음
         com.yonsai.rest_food_project.domain.user.entity.User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다: " + email));
 

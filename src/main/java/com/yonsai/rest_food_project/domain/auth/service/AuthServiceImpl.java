@@ -16,6 +16,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+// [인증 서비스] 회원가입, 다양한 로그인 방식(카카오/일반), 내 정보 관리 등 인증 전반의 로직을 수행
+
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
 
+    //[카카오 로그인] 카카오 토큰으로 사용자 정보를 가져와 DB에 저장(또는 업데이트)하고 JWT를 발급
     @Override
     @Transactional
     public AuthResponseDTO loginKakao(String kakaoAccessToken) {
@@ -56,10 +60,10 @@ public class AuthServiceImpl implements AuthService {
         return convertToAuthResponse(user, accessToken);
     }
 
+    //[일반 회원가입] 중복 체크 후 비밀번호를 암호화하여 저장하고, Redis에 닉네임을 등록한 뒤 토큰을 발행
     @Override
     @Transactional
     public AuthResponseDTO signUp(SignUpRequestDTO dto) {
-        log.info("---일반 회원가입 프로세스 시작: email={}---", dto.getEmail());
 
         // 1. 중복 가입 체크
         if (userService.existsByEmail(dto.getEmail())) {
@@ -85,12 +89,12 @@ public class AuthServiceImpl implements AuthService {
         return convertToAuthResponse(user, accessToken);
     }
 
+    // [정보 조회] 현재 요청한 사용자의 토큰을 파싱하여 DB에서 최신 유저 정보를 가져옵니다.
     @Override
     @Transactional
     public AuthResponseDTO getMe(String accessToken) {
-        log.info("---내 정보 조회 프로세스 시작---");
 
-        // 1. 토큰에서 이메일 추출 (이 과정 자체가 인증 확인)
+        // 1. 토큰에서 이메일 추출
         String jwtToken = accessToken.startsWith("Bearer ") ? accessToken.substring(7) : accessToken;
         String email = jwtProvider.getEmailFromToken(jwtToken);
 
@@ -100,10 +104,10 @@ public class AuthServiceImpl implements AuthService {
         return convertToAuthResponse(user, jwtToken);
     }
 
+    // [닉네임 수정] 유저의 닉네임을 변경하고 정보가 바뀌었으므로 새로운 정보를 담은 JWT를 재발급
     @Override
     @Transactional
     public AuthResponseDTO updateNickname(String accessToken, String newNickname, String profileImage) {
-        log.info("---닉네임 변경 프로세스 시작---");
 
         // 1. 토큰 정제 및 이메일 추출
         String jwtToken = accessToken.startsWith("Bearer ") ? accessToken.substring(7) : accessToken;
@@ -111,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 2. 유저 조회
         User user = userService.findByEmail(email);
-        // 이렇게 해야 ServiceImpl의 nicknameUpdate에서 기존 사진을 유지하며 DB에 반영합니다.
+
         User updatedUser = userService.nicknameUpdate(user.getId(), newNickname, profileImage);
 
         String newAccessToken = jwtProvider.createToken(updatedUser.getEmail(), updatedUser.getNickname());
@@ -121,10 +125,10 @@ public class AuthServiceImpl implements AuthService {
         return convertToAuthResponse(updatedUser, newAccessToken);
     }
 
+    // [일반 로그인] 이메일 존재 여부와 암호화된 비밀번호 일치 여부를 확인하여 인증 토큰을 발급
     @Override
     @Transactional
     public AuthResponseDTO loginLocal(String email, String password) {
-        log.info("---일반 로그인 프로세스 시작: email={}---", email);
 
         User user = userService.findByEmail(email);
 
@@ -139,7 +143,7 @@ public class AuthServiceImpl implements AuthService {
         return convertToAuthResponse(user, accessToken);
     }
 
-    // 유저응답용 공통 메서드
+    // [응답 변환] 유저 엔티티와 토큰을 결합하여 프론트엔드가 필요한 통합 사용자 정보를 DTO로 변환
     private AuthResponseDTO convertToAuthResponse(User user, String accessToken) {
         return AuthResponseDTO.builder()
                 .accessToken(accessToken)
@@ -149,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
                 .level(user.getLevel())
                 .xp(user.getXp())
                 .currentTitle(user.getCurrentTitle() != null ? 
-                          user.getCurrentTitle().getTitleName() : "신규 탐험가")
+                                user.getCurrentTitle().getTitleName() : "신규 탐험가")
                 .rewardPoint(user.getRewardPoint())
                 .reviewCount(user.getReviews().size())
                 .build();

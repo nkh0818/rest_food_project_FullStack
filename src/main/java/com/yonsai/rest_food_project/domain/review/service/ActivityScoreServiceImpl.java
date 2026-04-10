@@ -36,14 +36,13 @@ public class ActivityScoreServiceImpl implements ActivityScoreService {
             score += 10;
         }
 
-        // 같은 휴게소 방문 횟수 기반 점수 (현재 리뷰가 저장된 뒤 호출된다고 가정)
+        // 같은 휴게소 방문 횟수 기반 점수
         long reviewCountAtRestArea = reviewRepository.countByUserIdAndRestAreaStdRestCd(
                 user.getId(), review.getRestArea().getStdRestCd());
-
         if (reviewCountAtRestArea == 1) {
-            score += 5; // 첫 방문 휴게소 리뷰
+            score += 5;
         } else if (reviewCountAtRestArea > 1) {
-            score += 3; // 재방문 리뷰
+            score += 3;
         }
 
         user.addActivityScore(score);

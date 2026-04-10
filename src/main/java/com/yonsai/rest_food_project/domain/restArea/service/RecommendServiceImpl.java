@@ -13,6 +13,8 @@ import com.yonsai.rest_food_project.domain.restArea.repository.RestAreaRepositor
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+// [추천 서비스] 사용자의 취향(동반자, 우선순위)과 휴게소별 AI 태그를 분석하여 맞춤형 휴게소 Top 10을 추천
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class RecommendServiceImpl implements RecommendService {
 
     private final RestAreaRepository restAreaRepository;
 
+    // [AI 추천 로직] 모든 휴게소를 순회하며 별점 기반 기본 점수와 키워드 매칭 가산점을 합산
     @Transactional
     @Override
 public List<RestAreaResponseDto> getAiRecommendations(String companion, String priority) {
@@ -51,7 +54,7 @@ public List<RestAreaResponseDto> getAiRecommendations(String companion, String p
         .collect(Collectors.toList());
 }
 
-    // 내부 계산용 Helper Class
+    //[내부 헬퍼 클래스] 추천 점수 계산 과정에서 엔티티와 합산 점수를 한 쌍으로 관리하기 위한 데이터 객체
     private static class RecommendTemp {
         private final RestArea area;
         private final double score;

@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yonsai.rest_food_project.domain.user.dto.UserResponseDTO;
+import com.yonsai.rest_food_project.domain.user.entity.User;
+import com.yonsai.rest_food_project.domain.user.service.UserService;
 import com.yonsai.rest_food_project.global.auth.PrincipalDetails;
 import com.yonsai.rest_food_project.global.common.RedisService;
 
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -22,14 +25,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class UserController {
 
     private final RedisService redisService;
+    private final UserService userService;
 
+    @Transactional(readOnly = true)
     @GetMapping("/my")
     public ResponseEntity<UserResponseDTO> getMyInfo(
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return ResponseEntity.ok(UserResponseDTO.builder()
-                .email(principalDetails.getUsername())
-                .nickname(principalDetails.getNickname())
-                .build());
+        log.info(">>>> GET /api/user/my 요청 들어옴!");
+        UserResponseDTO response = userService.getMyInfo(principalDetails.getUser().getId());
+        return ResponseEntity.ok(response);
     }
 
     // --- 닉네임 중복확인 --- 0403 나다희 추가

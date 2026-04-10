@@ -5,8 +5,6 @@ import com.yonsai.rest_food_project.domain.ai.entity.ReviewResult;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
-// 문자를 조각낸다
-
 public interface ReviewSummarizer {
 
     @SystemMessage("""

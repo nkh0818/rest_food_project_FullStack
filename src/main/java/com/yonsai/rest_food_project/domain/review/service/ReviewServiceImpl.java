@@ -42,42 +42,13 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final LocationUtils locationUtils;
 
+    /** 리뷰를 생성하고 유저 보상(XP·포인트)을 지급한 뒤 AI 분석을 비동기로 트리거한다. */
     @Transactional
     @Override
     public ReviewResponseDTO createReview(Long userId, ReviewRequestDTO dto) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RoadQuestException("사용자를 찾을 수 없습니다. ID: " + userId));
-
-        RestArea restArea = restAreaRepository.findByStdRestCd(dto.getRestAreaId())
-                .orElseThrow(() -> new RoadQuestException("휴게소를 찾을 수 없습니다. ID: " + dto.getRestAreaId()));
-
-        Food food = null;
-        if (dto.getFoodId() != null) {
-            food = foodRepository.findById(dto.getFoodId()).orElse(null);
-        }
-
-        String tagString = (dto.getTags() == null || dto.getTags().isEmpty())
-                ? null
-                : String.join(",", dto.getTags());
-
-        boolean isVerified = false;
-
-        if (restArea.getLatitude() != null && restArea.getLongitude() != null &&
-                restArea.getLatitude() != 0.0 && restArea.getLongitude() != 0.0 &&
-                dto.getUserLat() != null && dto.getUserLon() != null) {
-
-            double distance = locationUtils.getDistance(
-                    dto.getUserLat(), dto.getUserLon(),
-                    restArea.getLatitude(), restArea.getLongitude());
-
-            // 1000m(1km) 이내면 인증 성공
-            isVerified = distance <= 1000;
-            log.info("GPS 인증 결과: {} (거리: {}m)", isVerified, (int) distance);
-        } else {
-            log.warn("좌표 데이터 부족으로 GPS 인증을 스킵합니다. (휴게소 코드: {})", restArea.getStdRestCd());
-            // 좌표가 없으면 기본값 false 유지
-        }
+        User user         = findUserById(userId);
+        RestArea restArea = findRestAreaById(dto.getRestAreaId());
+        Food food         = (dto.getFoodId() != null) ? foodRepository.findById(dto.getFoodId()).orElse(null) : null;
 
         Review review = Review.builder()
                 .user(user)
@@ -85,66 +56,42 @@ public class ReviewServiceImpl implements ReviewService {
                 .food(food)
                 .rating(dto.getRating())
                 .content(dto.getContent())
-                .tag(tagString)
+                .tag(buildTagString(dto.getTags()))
                 .imageUrl(dto.getImageUrl())
-                .gpsVerified(isVerified)
+                .gpsVerified(calculateGpsVerified(restArea, dto.getUserLat(), dto.getUserLon()))
                 .build();
 
         Review savedReview = reviewRepository.save(review);
 
-        user.addActivityScore(30);
-        user.setRewardPoint(user.getRewardPoint() + 100);
-
-        int newXp = user.getXp() + 30;
-        if (newXp >= 100) {
-            user.setLevel(user.getLevel() + 1);
-            user.setXp(newXp % 100);
-        } else {
-            user.setXp(newXp);
-        }
-
+        grantReviewReward(user);
         userRepository.saveAndFlush(user);
         titleService.checkAndGrantTitles(user);
 
-        // Ai 로직 추가 - 비동기 처리
-        long reviewCount = reviewRepository.countByRestArea(restArea);
-        if (reviewCount >= 5 && reviewCount % 5 == 0) {
-            List<Review> recentReviews = reviewRepository.findTop10ByRestAreaOrderByCreatedAtDesc(restArea);
-
-            String combinedContent = recentReviews.stream()
-                    .map(Review::getContent)
-                    .collect(Collectors.joining("\n"));
-
-            asyncAiReviewService.analyzeAndUpdate(restArea.getStdRestCd(), combinedContent);
-        }
-
-        userRepository.saveAndFlush(user);
+        triggerAiAnalysisIfNeeded(restArea);
 
         return ReviewResponseDTO.from(savedReview);
     }
 
-    // 커뮤니티 전체 피드 조회
+    /** 커뮤니티 전체 리뷰를 페이지 단위로 조회한다. */
     @Transactional(readOnly = true)
     @Override
     public Page<ReviewResponseDTO> getCommunityReviews(Pageable pageable) {
-        Page<Review> reviews = reviewRepository.findAll(pageable);
-        return reviews.map(ReviewResponseDTO::from);
+        return reviewRepository.findAll(pageable).map(ReviewResponseDTO::from);
     }
 
+    /** 특정 휴게소의 리뷰 목록을 조회하며, 로그인 사용자의 좋아요 여부를 함께 반환한다. */
     @Override
     public List<ReviewResponseDTO> getReviewsByRestArea(String restAreaId, Long userId) {
         return reviewRepository.findByRestAreaStdRestCd(restAreaId)
                 .stream()
                 .map(review -> {
-                    boolean liked = false;
-                    if (userId != null) {
-                        liked = reviewLikeRepository.existsByReviewIdAndUserId(review.getId(), userId);
-                    }
+                    boolean liked = userId != null && reviewLikeRepository.existsByReviewIdAndUserId(review.getId(), userId);
                     return ReviewResponseDTO.from(review, liked);
                 })
                 .toList();
     }
 
+    /** 특정 음식에 달린 리뷰 목록을 조회한다. */
     @Override
     public List<ReviewResponseDTO> getReviewsByFood(Long foodId) {
         return reviewRepository.findByFoodId(foodId)
@@ -153,16 +100,16 @@ public class ReviewServiceImpl implements ReviewService {
                 .toList();
     }
 
+    /** 내가 작성한 리뷰 목록을 조회한다. */
     @Override
     public List<ReviewResponseDTO> getMyReviews(Long userId) {
         return reviewRepository.findByUserId(userId)
                 .stream()
-                .map(review -> {
-                    return ReviewResponseDTO.from(review);
-                })
+                .map(ReviewResponseDTO::from)
                 .toList();
     }
 
+    /** 리뷰 ID로 단건 조회한다. */
     @Override
     public ReviewResponseDTO getReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
@@ -170,6 +117,7 @@ public class ReviewServiceImpl implements ReviewService {
         return ReviewResponseDTO.from(review);
     }
 
+    /** 작성자 본인만 리뷰 내용·평점·태그를 수정할 수 있다. */
     @Transactional
     @Override
     public void updateReview(Long reviewId, Long userId, ReviewUpdateRequestDTO dto) {
@@ -183,11 +131,12 @@ public class ReviewServiceImpl implements ReviewService {
         review.update(dto.getContent(), dto.getRating(), dto.getTag());
     }
 
+    /** 작성자 본인 또는 관리자가 리뷰를 삭제한다. */
     @Transactional
     @Override
     public void deleteReview(Long reviewId, User currentUser) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 없습니다."));
+                .orElseThrow(() -> new RoadQuestException("해당 리뷰가 없습니다."));
 
         if (review.getUser().getId().equals(currentUser.getId()) || currentUser.isAdmin()) {
             reviewRepository.delete(review);
@@ -196,34 +145,33 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
+    /** 특정 휴게소의 리뷰 평균 평점을 반환한다. */
     @Override
     public Double getAverageRating(String restAreaId) {
         return reviewRepository.getAverageRating(restAreaId);
     }
 
+    /** 특정 휴게소의 총 리뷰 수를 반환한다. */
     @Override
     public Long getReviewCount(String restAreaId) {
         return reviewRepository.countByRestAreaStdRestCd(restAreaId);
     }
 
+    /** 리뷰에 좋아요를 추가한다. 본인 리뷰·중복 좋아요는 거부한다. */
     @Transactional
     @Override
     public void likeReview(Long reviewId, Long userId) {
-        // 1. 리뷰 조회
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RoadQuestException("해당 리뷰를 찾을 수 없습니다."));
 
-        // 2. 본인 리뷰 체크
         if (review.getUser().getId().equals(userId)) {
             throw new RoadQuestException("자신의 리뷰에는 좋아요를 누를 수 없습니다.");
         }
 
-        // 3. 중복 좋아요 체크
         if (reviewLikeRepository.existsByReviewIdAndUserId(reviewId, userId)) {
             throw new RoadQuestException("이미 좋아요를 누른 리뷰입니다.");
         }
 
-        // 4. 좋아요 저장
         User user = userRepository.getReferenceById(userId);
         ReviewLike reviewLike = ReviewLike.builder()
                 .review(review)
@@ -231,25 +179,78 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
 
         reviewLikeRepository.save(reviewLike);
-
-        // 5. 좋아요 수 증가
         review.addLike();
     }
 
+    /** 리뷰 좋아요를 취소하고 좋아요 수를 감소시킨다. */
     @Transactional
     @Override
     public void unlikeReview(Long reviewId, Long userId) {
-
         ReviewLike like = reviewLikeRepository.findByReviewIdAndUserId(reviewId, userId)
                 .orElseThrow(() -> new RoadQuestException("좋아요 기록을 찾을 수 없습니다."));
 
         reviewLikeRepository.delete(like);
-
         like.getReview().removeLike();
     }
 
+    /** 해당 사용자가 리뷰에 좋아요를 눌렀는지 여부를 반환한다. */
     @Override
     public boolean isLiked(Long reviewId, Long userId) {
         return reviewLikeRepository.existsByReviewIdAndUserId(reviewId, userId);
+    }
+
+    // --- 헬퍼 메서드 ---
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RoadQuestException("사용자를 찾을 수 없습니다. ID: " + userId));
+    }
+
+    private RestArea findRestAreaById(String restAreaId) {
+        return restAreaRepository.findByStdRestCd(restAreaId)
+                .orElseThrow(() -> new RoadQuestException("휴게소를 찾을 수 없습니다. ID: " + restAreaId));
+    }
+
+    private String buildTagString(List<String> tags) {
+        if (tags == null || tags.isEmpty()) return null;
+        return String.join(",", tags);
+    }
+
+    private boolean calculateGpsVerified(RestArea restArea, Double userLat, Double userLon) {
+        if (restArea.getLatitude() == null || restArea.getLongitude() == null ||
+                restArea.getLatitude() == 0.0 || restArea.getLongitude() == 0.0 ||
+                userLat == null || userLon == null) {
+            log.warn("좌표 데이터 부족으로 GPS 인증을 스킵합니다. (휴게소 코드: {})", restArea.getStdRestCd());
+            return false;
+        }
+        double distance = locationUtils.getDistance(userLat, userLon,
+                restArea.getLatitude(), restArea.getLongitude());
+        boolean verified = distance <= 1000;
+        log.info("GPS 인증 결과: {} (거리: {}m)", verified, (int) distance);
+        return verified;
+    }
+
+    private void grantReviewReward(User user) {
+        user.addActivityScore(30);
+        user.setRewardPoint(user.getRewardPoint() + 100);
+        int newXp = user.getXp() + 30;
+        if (newXp >= 100) {
+            user.setLevel(user.getLevel() + 1);
+            user.setXp(newXp % 100);
+        } else {
+            user.setXp(newXp);
+        }
+    }
+
+    private void triggerAiAnalysisIfNeeded(RestArea restArea) {
+        long reviewCount = reviewRepository.countByRestArea(restArea);
+        if (reviewCount >= 5 && reviewCount % 5 == 0) {
+            String combinedContent = reviewRepository
+                    .findTop10ByRestAreaOrderByCreatedAtDesc(restArea)
+                    .stream()
+                    .map(Review::getContent)
+                    .collect(Collectors.joining("\n"));
+            asyncAiReviewService.analyzeAndUpdate(restArea.getStdRestCd(), combinedContent);
+        }
     }
 }

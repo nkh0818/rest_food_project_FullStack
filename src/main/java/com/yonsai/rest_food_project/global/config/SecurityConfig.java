@@ -20,6 +20,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+// [보안 메인 설정] Spring Security를 통해 웹 보안, CORS, JWT 필터링 및 API 접근 권한을 총괄 설정
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
 
+    // [비밀번호 암호화] 사용자 비밀번호를 안전하게 해시화하여 DB에 저장하기 위한 BCrypt 인코더
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -39,12 +42,16 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
+
+                // [세션 정책] JWT를 사용하므로 서버에 세션을 저장하지 않는 STATELESS 모드 설정
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // 누구나 볼 수 있는 조회 api
+                        // [보안 필터 체인] HTTP 요청에 대한 보안 규칙(인증, 인가, 세션 관리, 필터 순서)을 설정
+
+                        // 단순 조회 및 공통 API: 누구나 접근 가능(permitAll)
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ranking/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
@@ -73,7 +80,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS 세부 설정 Bean
+    // [CORS] 세부 설정 Bean
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

@@ -41,7 +41,7 @@ public class RedisService {
 
     public List<String> getDailyRanking() {
         // 데일리 조회
-        Set<String> ranking = redisTemplate.opsForZSet().reverseRange("ranking:search:daily", 0, 9);
+        Set<String> ranking = redisTemplate.opsForZSet().reverseRange("ranking:search:daily", 0, 5);
         return new ArrayList<>(ranking);
     }
 

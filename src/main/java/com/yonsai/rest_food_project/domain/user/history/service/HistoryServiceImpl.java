@@ -45,7 +45,6 @@ public class HistoryServiceImpl implements HistoryService {
                     .id(review.getId())
                     .date(review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
                     .routeName(routeName)
-                    // 제목을 "경부고속도로 여정" 혹은 "안성휴게소 탐방" 식으로 동적으로!
                     .title(restArea.getRouteName() != null ? routeName + " 여정" : restName + " 탐험")
                     .aiSummary(restArea.getAiSummary() != null ? restArea.getAiSummary() : "맛있는 추억을 쌓았어요!")
                     .stops(List.of(stopInfo))

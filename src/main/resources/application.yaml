@@ -4,6 +4,13 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 10
+      idle-timeout: 30000
+      max-lifetime: 580000       # 10분 약간 안 되게 설정 (MySQL 연결 끊김 방지 핵심!)
+      connection-timeout: 30000
+      connection-test-query: SELECT 1  # 연결이 살아있는지 확인하는 쿼리
 
   jpa:
     defer-datasource-initialization: true

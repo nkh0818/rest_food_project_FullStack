@@ -4,8 +4,7 @@ import com.yonsai.rest_food_project.domain.user.dto.UserResponseDTO;
 import com.yonsai.rest_food_project.domain.user.entity.User;
 
 public interface UserService {
-
-    UserResponseDTO getMyInfo(Long userId);
+    
 
     // OAuth 회원가입/업데이트 (카카오 등)
     User saveOrUpdate(String email, String nickname, String provider, String providerId);
@@ -21,6 +20,7 @@ public interface UserService {
 
     // 정보조회
     UserResponseDTO getMyInfo(Long userId);
+    
 
     // 닉네임 변경
     // User nicknameUpdate(Long userId, String newNickname);

@@ -35,9 +35,11 @@ public class AuthServiceImpl implements AuthService {
     //[카카오 로그인] 카카오 토큰으로 사용자 정보를 가져와 DB에 저장(또는 업데이트)하고 JWT를 발급
     @Override
     @Transactional
-    public AuthResponseDTO loginKakao(String kakaoAccessToken) {
+    public AuthResponseDTO loginKakao(String code) {
 
-        log.info("---카카오 로그인 프로세스 시작---");
+        log.info("---카카오 로그인 프로세스 시작---(인가코드)");
+
+        String kakaoAccessToken = kakaoApiModule.getAccessToken(code);
 
         // 1. module 호출해서 dto를 가져옴
         OAuthRequestDTO dto = kakaoApiModule.getUserInfo(kakaoAccessToken);
@@ -152,6 +154,7 @@ public class AuthServiceImpl implements AuthService {
                 .profileImage(user.getProfileImage())
                 .level(user.getLevel())
                 .xp(user.getXp())
+                .provider(user.getProvider())
                 .currentTitle(user.getCurrentTitle() != null ? 
                                 user.getCurrentTitle().getTitleName() : "신규 탐험가")
                 .rewardPoint(user.getRewardPoint())

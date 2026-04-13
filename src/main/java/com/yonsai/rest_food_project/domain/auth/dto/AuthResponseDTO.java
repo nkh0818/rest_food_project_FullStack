@@ -20,4 +20,5 @@ public class AuthResponseDTO {
     private long reviewCount;
     private String currentTitle;
     private String profileImage;
+    private String provider;
 }

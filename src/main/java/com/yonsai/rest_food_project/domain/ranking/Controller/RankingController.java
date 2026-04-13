@@ -28,35 +28,46 @@ public class RankingController {
     private final RedisService redisService;
     private final RankingService rankingService;
 
+    /**
+     * 1. 검색어 기록 저장 (POST)
+     * 프론트에서 검색할 때 호출
+     */
     @PostMapping("/record")
     public ResponseEntity<Void> recordSearchKeyword(@Valid @RequestBody SearchRankingRequestDTO request) {
         redisService.incrementSearchCount(request.getKeyword());
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 2. 종합 랭킹 조회 (GET)
+     * 실시간 검색어(Daily), 베스트 리뷰, 급상승 휴게소 등을 한 번에 가져옴
+     * 프론트 메인이나 검색 메인에서 사용
+     */
     @GetMapping("/totalrank")
     public ResponseEntity<TotalRankingResponseDTO> getRankings() {
         return ResponseEntity.ok(rankingService.getTotalRankings());
     }
 
-    // -----------조회------------
+    // ----------- 개별 조회 API (필요한 경우만 사용) ------------
 
-    // 상위 10개 키워드 가져오기
-    @GetMapping("/search")
-    public ResponseEntity<Set<String>> getSearchRanking() {
-        return ResponseEntity.ok(redisService.getTopSearchKeywords(10));
-    }
-
-    // 데일리 랭킹 가져오기
+    /**
+     * 데일리 실시간 검색어 랭킹 (상위 10개)
+     */
     @GetMapping("/search/daily")
     public ResponseEntity<List<String>> getDailyRanking() {
         return ResponseEntity.ok(redisService.getDailyRanking());
     }
 
-    // 전체 랭킹 가져오기
+    /**
+     * 전체 누적 검색어 랭킹
+     */
     @GetMapping("/search/all")
     public ResponseEntity<List<String>> getAllTimeRanking() {
         return ResponseEntity.ok(redisService.getAllRanking());
     }
-
+    
+    @GetMapping("/search")
+    public ResponseEntity<Set<String>> getSearchRanking() {
+        return ResponseEntity.ok(redisService.getTopSearchKeywords(10));
+    }
 }

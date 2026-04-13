@@ -9,7 +9,7 @@ import com.yonsai.rest_food_project.domain.ranking.dto.TotalRankingResponseDTO;
 import com.yonsai.rest_food_project.domain.ranking.service.RankingService;
 import com.yonsai.rest_food_project.global.common.RedisService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

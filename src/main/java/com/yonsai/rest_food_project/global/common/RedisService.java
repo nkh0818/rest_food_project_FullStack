@@ -17,43 +17,47 @@ public class RedisService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    // --- [닉네임 중복 방지 저장/중복확인(b)/삭제] ---
+    private static final String DAILY_RANKING_KEY = "ranking:search:daily";
+    private static final String ALL_RANKING_KEY = "ranking:search:all";
+    private static final String NICKNAME_KEY = "user:nicknames";
+
+    // --- [닉네임] ---
     public void saveNickname(String nickname) {
-        redisTemplate.opsForSet().add("user:nicknames", nickname);
+        redisTemplate.opsForSet().add(NICKNAME_KEY, nickname);
     }
 
     public boolean isNicknameExists(String nickname) {
-        return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember("user:nicknames", nickname));
+        return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(NICKNAME_KEY, nickname));
     }
 
     public void deleteNickname(String nickname) {
-        redisTemplate.opsForSet().remove("users:nicknames", nickname);
+        redisTemplate.opsForSet().remove(NICKNAME_KEY, nickname);
     }
 
-    // --- 핫 트랜드 검색어 (검색어+1점) ---
+    // --- [핫 트랜드 검색어] ---
     public void incrementSearchCount(String keyword) {
-        // 전체누적
-        redisTemplate.opsForZSet().incrementScore("ranking:search:all", keyword, 1);
-
-        // 하루누적
-        redisTemplate.opsForZSet().incrementScore("ranking:search:daily", keyword, 1);
+        if (keyword == null || keyword.trim().isEmpty()) return;
+        
+        String trimmedKeyword = keyword.trim();
+        log.info("Redis 검색어 카운트 증가: {}", trimmedKeyword);
+        
+        redisTemplate.opsForZSet().incrementScore(ALL_RANKING_KEY, trimmedKeyword, 1);
+        redisTemplate.opsForZSet().incrementScore(DAILY_RANKING_KEY, trimmedKeyword, 1);
     }
 
     public List<String> getDailyRanking() {
-        // 데일리 조회
-        Set<String> ranking = redisTemplate.opsForZSet().reverseRange("ranking:search:daily", 0, 5);
-        return new ArrayList<>(ranking);
+        Set<String> ranking = redisTemplate.opsForZSet().reverseRange(DAILY_RANKING_KEY, 0, 9); // 상위 10개로 넉넉히
+        return ranking != null ? new ArrayList<>(ranking) : new ArrayList<>();
     }
 
     public List<String> getAllRanking() {
-        // 데일리 조회
-    Set<String> ranking = redisTemplate.opsForZSet().reverseRange("ranking:search:all", 0, 9);
-    return new ArrayList<>(ranking);
-}
+        // 전체 누적(ranking:search:all) 조회 상위 10개
+        Set<String> ranking = redisTemplate.opsForZSet().reverseRange(ALL_RANKING_KEY, 0, 9);
+        return ranking != null ? new ArrayList<>(ranking) : new ArrayList<>();
+    }
 
     public Set<String> getTopSearchKeywords(int limit) {
-        // 점수 높은 순으로 상위 N개 가져오기
-        return redisTemplate.opsForZSet().reverseRange("ranking:search", 0, limit - 1);
+        return redisTemplate.opsForZSet().reverseRange(DAILY_RANKING_KEY, 0, limit - 1);
     }
 
     // --- [3. 리뷰 좋아요 중복 방지] ---
